@@ -2,14 +2,23 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use tauri::Window;
+use std::fs;
+
 
 #[tauri::command]
-fn load_path(path: &str, window: Window) -> String {
-    let total = 100000;
+fn load_path(data_path: &str, window: Window) -> String {
+    let path_to_load = data_path.clone();
 
-    for i in 0..total {
-        let window = window.clone();
-        std::thread::spawn(move || {
+    std::thread::spawn(move || {
+        let paths = fs::read_dir(path_to_load).unwrap();
+
+        for path in paths {
+            println!("Name: {}", path.unwrap().path().display())
+        }
+
+        let total = 100000;
+        for i in 0..total {
+            let window = window.clone();
             window
                 .emit(
                     "loading://progress",
@@ -19,13 +28,11 @@ fn load_path(path: &str, window: Window) -> String {
                     }),
                 )
                 .unwrap();
-        });
-        // Sleep
-        std::thread::sleep(std::time::Duration::from_millis(10));
-        println!("{}: {}", path, i);
-    }
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+    });
 
-    format!("done with {}", path)
+    "Started".to_string()
 }
 
 fn main() {
