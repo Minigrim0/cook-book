@@ -2,7 +2,7 @@
 
 diesel::table! {
     author (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         #[sql_name = "type"]
         type_ -> Text,
         name -> Text,
@@ -12,90 +12,90 @@ diesel::table! {
 
 diesel::table! {
     category (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
 
 diesel::table! {
     cuisine (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
 
 diesel::table! {
     ingredient (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
 
 diesel::table! {
     rating (id) {
-        id -> Nullable<Integer>,
-        rating -> Integer,
+        id -> Integer,
+        score -> Integer,
         amount -> Integer,
     }
 }
 
 diesel::table! {
-    receipt (id) {
-        id -> Nullable<Integer>,
+    recipe (id) {
+        id -> Integer,
         name -> Text,
-        cookTime -> Integer,
-        prepTime -> Integer,
+        cook_time -> Integer,
+        prep_time -> Integer,
         #[sql_name = "yield"]
         yield_ -> Integer,
-        authorId -> Integer,
-        ratingId -> Integer,
-        categoryId -> Integer,
+        author_id -> Integer,
+        rating_id -> Integer,
+        category_id -> Integer,
     }
 }
 
 diesel::table! {
-    receipt_cuisine (id) {
-        id -> Nullable<Integer>,
-        receiptId -> Integer,
-        cuisineId -> Integer,
+    recipe_cuisine (id) {
+        id -> Integer,
+        recipe_id -> Integer,
+        cuisine_id -> Integer,
     }
 }
 
 diesel::table! {
-    receipt_ingredient (id) {
-        id -> Nullable<Integer>,
-        receiptId -> Integer,
-        ingredientId -> Integer,
-        unitId -> Integer,
+    recipe_ingredient (id) {
+        id -> Integer,
+        recipe_id -> Integer,
+        ingredient_id -> Integer,
+        unit_id -> Integer,
         amount -> Text,
     }
 }
 
 diesel::table! {
     step (id) {
-        id -> Nullable<Integer>,
-        receiptId -> Integer,
-        step -> Integer,
+        id -> Integer,
+        recipe_id -> Integer,
+        number -> Integer,
         description -> Text,
     }
 }
 
 diesel::table! {
     unit (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
 
-diesel::joinable!(receipt -> author (authorId));
-diesel::joinable!(receipt -> category (categoryId));
-diesel::joinable!(receipt -> rating (ratingId));
-diesel::joinable!(receipt_cuisine -> cuisine (cuisineId));
-diesel::joinable!(receipt_cuisine -> receipt (receiptId));
-diesel::joinable!(receipt_ingredient -> ingredient (ingredientId));
-diesel::joinable!(receipt_ingredient -> receipt (receiptId));
-diesel::joinable!(receipt_ingredient -> unit (unitId));
-diesel::joinable!(step -> receipt (receiptId));
+diesel::joinable!(recipe -> author (author_id));
+diesel::joinable!(recipe -> category (category_id));
+diesel::joinable!(recipe -> rating (rating_id));
+diesel::joinable!(recipe_cuisine -> cuisine (cuisine_id));
+diesel::joinable!(recipe_cuisine -> recipe (recipe_id));
+diesel::joinable!(recipe_ingredient -> ingredient (ingredient_id));
+diesel::joinable!(recipe_ingredient -> recipe (recipe_id));
+diesel::joinable!(recipe_ingredient -> unit (unit_id));
+diesel::joinable!(step -> recipe (recipe_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     author,
@@ -103,9 +103,9 @@ diesel::allow_tables_to_appear_in_same_query!(
     cuisine,
     ingredient,
     rating,
-    receipt,
-    receipt_cuisine,
-    receipt_ingredient,
+    recipe,
+    recipe_cuisine,
+    recipe_ingredient,
     step,
     unit,
 );
