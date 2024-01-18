@@ -4,8 +4,8 @@
     </form>
 
     <p>{{ returnMessage }}</p>
+    <small>{{ currentRecipe }}</small>
 </template>
-
 
 <script>
 import { invoke } from "@tauri-apps/api/tauri";
@@ -18,6 +18,7 @@ export default {
     data() {
         return {
             returnMessage: "",
+            currentRecipe: ""
         }
     },
     methods: {
@@ -32,14 +33,14 @@ export default {
             } else {
                 // user selected a single directory
                 console.log(selected);
-                await invoke("load_path", { data_path: selected });
+                await invoke("load_path", { dataPath: selected });
             }
         }
     },
     mounted() {
         appWindow.listen("loading://progress", (data) => {
-            console.log(data);
             this.returnMessage = `Loading ${data.payload.progress}/${data.payload.total}`;
+            this.currentRecipe = data.payload.path;
         });
     }
 };

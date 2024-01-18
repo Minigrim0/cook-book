@@ -1,34 +1,39 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::sync::{Arc, Mutex};
 use tauri::Window;
 use std::fs;
 
+pub mod schema;
+pub mod database;
+pub mod parser;
 
 #[tauri::command]
 fn load_path(data_path: &str, window: Window) -> String {
-    let path_to_load = data_path.clone();
+    let path_to_load = Arc::new(Mutex::new(data_path.to_string()));
 
     std::thread::spawn(move || {
-        let paths = fs::read_dir(path_to_load).unwrap();
+        let path_to_load = path_to_load.clone();
+        let path_to_load = path_to_load.lock().unwrap();
+        let paths = fs::read_dir(&*path_to_load).unwrap();
+        let paths: Vec<_> = paths.collect();
+        let count = paths.len();
 
-        for path in paths {
-            println!("Name: {}", path.unwrap().path().display())
-        }
-
-        let total = 100000;
-        for i in 0..total {
+        for (index, path) in paths.iter().enumerate() {
             let window = window.clone();
+            let path = path.as_ref().unwrap();
+
             window
                 .emit(
                     "loading://progress",
                     serde_json::json!({
-                        "progress": i,
-                        "total": total,
+                        "progress": index,
+                        "total": count,
+                        "path": path.path().to_str().unwrap(),
                     }),
                 )
                 .unwrap();
-            std::thread::sleep(std::time::Duration::from_millis(10));
         }
     });
 
