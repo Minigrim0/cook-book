@@ -2,8 +2,10 @@
 DROP TABLE author;
 DROP TABLE rating;
 DROP TABLE unit;
-DROP TABLE receipt_ingredient;
+DROP TABLE recipe_ingredient;
 DROP TABLE ingredient;
+DROP TABLE cuisine;
+DROP TABLE recipe_cuisine;
 DROP TABLE step;
 DROP TABLE category;
-DROP TABLE receipt;
+DROP TABLE recipe;

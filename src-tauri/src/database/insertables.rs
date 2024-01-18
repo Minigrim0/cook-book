@@ -1,56 +1,79 @@
 use diesel::prelude::*;
 
-#[derive(Queryable, Selectable)]
+pub trait Saveable {
+    fn save(&self, connection: &mut SqliteConnection) -> Result<i32, diesel::result::Error>;
+}
+
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::author)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Author {
+pub struct NewAuthor {
     pub id: i32,
     pub type_: String,
     pub name: String,
     pub url: String,
 }
 
-#[derive(Queryable, Selectable)]
+impl Saveable for NewAuthor {
+    fn save(&self, connection: &mut SqliteConnection) -> Result<i32, diesel::result::Error> {
+        diesel::insert_into(crate::schema::author::table)
+            .values(self)
+            .execute(connection)
+            .expect("Error saving new author");
+
+            let last_id: i32 = diesel::select(
+                diesel::dsl::sql::<diesel::sql_types::Integer>(
+                    "last_insert_rowid()"
+                )
+            )
+                .get_result(connection)
+                .expect("Error getting last insert rowid");
+        Ok(last_id)
+    }
+}
+
+
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::category)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Category {
+pub struct NewCategory {
     pub id: i32,
     pub name: String,
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::cuisine)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Cuisine {
+pub struct NewCuisine {
     pub id: i32,
     pub name: String,
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::ingredient)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Ingredient {
+pub struct NewIngredient {
     pub id: i32,
     pub name: String,
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::rating)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Rating {
+pub struct NewRating {
     pub id: i32,
     pub score: i32,
     pub amount: i32,
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::recipe)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Recipe {
+pub struct NewRecipe {
     pub id: i32,
     pub name: String,
     pub cook_time: i32,
@@ -62,10 +85,10 @@ pub struct Recipe {
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::recipe_ingredient)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct RecipeIngredient {
+pub struct NewRecipeIngredient {
     pub id: i32,
     pub recipe_id: i32,
     pub ingredient_id: i32,
@@ -74,10 +97,10 @@ pub struct RecipeIngredient {
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::step)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Step {
+pub struct NewStep {
     pub id: i32,
     pub recipe_id: i32,
     pub number: i32,
@@ -85,10 +108,10 @@ pub struct Step {
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Insertable)]
 #[diesel(table_name = crate::schema::unit)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct Unit {
+pub struct NewUnit {
     pub id: i32,
     pub name: String,
 }
