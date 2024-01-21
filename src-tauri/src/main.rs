@@ -22,7 +22,17 @@ fn load_path(data_path: &str, window: Window) -> String {
 
         for (index, path) in paths.iter().enumerate() {
             let window = window.clone();
-            let path = path.as_ref().unwrap();
+            let path = match path {
+                Ok(entry) => entry,
+                Err(err) => {
+                    println!("An error occured while loading path {}", err.to_string());
+                    continue;
+                }
+            };
+            match parser::json_parser::parse_recipe(path) {
+                Ok(msg) => println!("Recipe loaded {}", msg),
+                Err(msg) => println!("Error while loading recipe {}", msg)
+            }
 
             window
                 .emit(
