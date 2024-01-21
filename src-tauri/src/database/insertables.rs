@@ -22,7 +22,7 @@ impl DBWrapped for NewAuthor {
     fn exists(&self) -> bool {
         use crate::schema::author::dsl::*;
 
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
         match author
             .filter(type_.eq(self.type_.clone()))
             .filter(name.eq(self.name.clone()))
@@ -39,7 +39,7 @@ impl DBWrapped for NewAuthor {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::author::table)
             .values(self)
@@ -68,7 +68,7 @@ pub struct NewCategory {
 impl DBWrapped for NewCategory {
     fn exists(&self) -> bool {
         use crate::schema::category::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match category
             .filter(name.eq(self.name.clone()))
@@ -84,7 +84,7 @@ impl DBWrapped for NewCategory {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::category::table)
             .values(self)
@@ -113,7 +113,7 @@ pub struct NewCuisine {
 impl DBWrapped for NewCuisine {
     fn exists(&self) -> bool {
         use crate::schema::cuisine::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match cuisine
             .filter(name.eq(self.name.clone()))
@@ -129,7 +129,7 @@ impl DBWrapped for NewCuisine {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::cuisine::table)
             .values(self)
@@ -158,7 +158,7 @@ pub struct NewIngredient {
 impl DBWrapped for NewIngredient {
     fn exists(&self) -> bool {
         use crate::schema::ingredient::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match ingredient
             .filter(name.eq(self.name.clone()))
@@ -174,7 +174,7 @@ impl DBWrapped for NewIngredient {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::ingredient::table)
             .values(self)
@@ -204,7 +204,7 @@ pub struct NewRating {
 impl DBWrapped for NewRating {
     fn exists(&self) -> bool {
         use crate::schema::rating::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match rating
             .filter(score.eq(self.score.clone()))
@@ -221,7 +221,7 @@ impl DBWrapped for NewRating {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::rating::table)
             .values(self)
@@ -256,7 +256,7 @@ pub struct NewRecipe {
 impl DBWrapped for NewRecipe {
     fn exists(&self) -> bool {
         use crate::schema::recipe::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match recipe
             .filter(name.eq(self.name.clone()))
@@ -274,7 +274,7 @@ impl DBWrapped for NewRecipe {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::recipe::table)
             .values(self)
@@ -306,7 +306,7 @@ pub struct NewRecipeIngredient {
 impl DBWrapped for NewRecipeIngredient {
     fn exists(&self) -> bool {
         use crate::schema::recipe_ingredient::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match recipe_ingredient
             .filter(recipe_id.eq(self.recipe_id.clone()))
@@ -323,7 +323,7 @@ impl DBWrapped for NewRecipeIngredient {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::recipe_ingredient::table)
             .values(self)
@@ -354,7 +354,7 @@ pub struct NewStep {
 impl DBWrapped for NewStep {
     fn exists(&self) -> bool {
         use crate::schema::step::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match step
             .filter(recipe_id.eq(self.recipe_id))
@@ -371,7 +371,7 @@ impl DBWrapped for NewStep {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::step::table)
             .values(self)
@@ -400,7 +400,7 @@ pub struct NewUnit {
 impl DBWrapped for NewUnit {
     fn exists(&self) -> bool {
         use crate::schema::unit::dsl::*;
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         match unit
             .filter(name.eq(self.name.clone()))
@@ -416,7 +416,7 @@ impl DBWrapped for NewUnit {
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
-        let mut connection: &mut SqliteConnection = &mut establish_connection();
+        let connection: &mut SqliteConnection = &mut establish_connection();
 
         diesel::insert_into(crate::schema::unit::table)
             .values(self)
