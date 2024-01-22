@@ -5,7 +5,7 @@ use diesel::dsl::count;
 use crate::database::connection::establish_connection;
 
 pub trait DBWrapped {
-    fn exists(&self) -> bool;
+    fn exists(&self) -> Option<i32>;  // Returns the id of the existing row if any
     fn save(&self) -> Result<i32, diesel::result::Error>;
 }
 
@@ -19,21 +19,19 @@ pub struct NewAuthor {
 }
 
 impl DBWrapped for NewAuthor {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::author::dsl::*;
 
         let connection: &mut SqliteConnection = &mut establish_connection();
         match author
-            .filter(type_.eq(self.type_.clone()))
-            .filter(name.eq(self.name.clone()))
             .filter(url.eq(self.url.clone()))
-            .select(count(name))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting author: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -66,19 +64,19 @@ pub struct NewCategory {
 }
 
 impl DBWrapped for NewCategory {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::category::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match category
             .filter(name.eq(self.name.clone()))
-            .select(count(name))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting category: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -111,19 +109,19 @@ pub struct NewCuisine {
 }
 
 impl DBWrapped for NewCuisine {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::cuisine::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match cuisine
             .filter(name.eq(self.name.clone()))
-            .select(count(name))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting cuisine: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -156,19 +154,19 @@ pub struct NewIngredient {
 }
 
 impl DBWrapped for NewIngredient {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match ingredient
             .filter(name.eq(self.name.clone()))
-            .select(count(name))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting ingredient: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -202,20 +200,20 @@ pub struct NewRating {
 }
 
 impl DBWrapped for NewRating {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::rating::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match rating
             .filter(score.eq(self.score.clone()))
             .filter(amount.eq(self.amount.clone()))
-            .select(count(score))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting rating: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -254,7 +252,7 @@ pub struct NewRecipe {
 }
 
 impl DBWrapped for NewRecipe {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::recipe::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
@@ -263,14 +261,15 @@ impl DBWrapped for NewRecipe {
             .filter(cook_time.eq(self.cook_time.clone()))
             .filter(prep_time.eq(self.prep_time.clone()))
             .filter(yield_.eq(self.yield_.clone()))
-            .select(count(name))
-            .first::<i64>(connection) {
-                Ok(val) => val == 1,
-                Err(err) => {
-                    println!("Error counting recipe: {}", err.to_string());
-                    false
-                }
+            .select(id)
+            .first::<i32>(connection)
+        {
+            Ok(id_) => Some(id_),
+            Err(err) => {
+                println!("Error counting recipe: {}", err.to_string());
+                None
             }
+        }
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -304,20 +303,20 @@ pub struct NewRecipeIngredient {
 }
 
 impl DBWrapped for NewRecipeIngredient {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::recipe_ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match recipe_ingredient
             .filter(recipe_id.eq(self.recipe_id.clone()))
             .filter(ingredient_id.eq(self.ingredient_id.clone()))
-            .select(count(recipe_id))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting recipe_ingredient: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -352,20 +351,20 @@ pub struct NewStep {
 }
 
 impl DBWrapped for NewStep {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::step::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match step
             .filter(recipe_id.eq(self.recipe_id))
             .filter(number.eq(self.number))
-            .select(count(number))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting step: {}", err.to_string());
-                false
+                None
             }
         }
     }
@@ -398,19 +397,19 @@ pub struct NewUnit {
 }
 
 impl DBWrapped for NewUnit {
-    fn exists(&self) -> bool {
+    fn exists(&self) -> Option<i32> {
         use crate::schema::unit::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         match unit
             .filter(name.eq(self.name.clone()))
-            .select(count(name))
-            .first::<i64>(connection)
+            .select(id)
+            .first::<i32>(connection)
         {
-            Ok(val) => val == 1,
+            Ok(id_) => Some(id_),
             Err(err) => {
                 println!("Error counting unit: {}", err.to_string());
-                false
+                None
             }
         }
     }
