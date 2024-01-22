@@ -1,10 +1,10 @@
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
-use diesel::dsl::count;
 
 use crate::database::connection::establish_connection;
 
 pub trait DBWrapped {
+    fn new(data: &serde_json::Value) -> Self;
     fn exists(&self) -> Option<i32>;  // Returns the id of the existing row if any
     fn save(&self) -> Result<i32, diesel::result::Error>;
 }
@@ -19,6 +19,14 @@ pub struct NewAuthor {
 }
 
 impl DBWrapped for NewAuthor {
+    fn new(data: &serde_json::Value) -> Self {
+        NewAuthor {
+            type_: data["@type"].as_str().unwrap_or("unknown").to_string(),
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+            url: data["url"].as_str().unwrap_or("unknown").to_string()
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::author::dsl::*;
 
@@ -29,10 +37,7 @@ impl DBWrapped for NewAuthor {
             .first::<i32>(connection)
         {
             Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting author: {}", err.to_string());
-                None
-            }
+            Err(_err) => None  // Author was not found, does not exist
         }
     }
 
@@ -64,6 +69,12 @@ pub struct NewCategory {
 }
 
 impl DBWrapped for NewCategory {
+    fn new(data: &serde_json::Value) -> Self {
+        NewCategory {
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::category::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -109,6 +120,12 @@ pub struct NewCuisine {
 }
 
 impl DBWrapped for NewCuisine {
+    fn new(data: &serde_json::Value) -> Self {
+        NewCuisine {
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::cuisine::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -154,6 +171,12 @@ pub struct NewIngredient {
 }
 
 impl DBWrapped for NewIngredient {
+    fn new(data: &serde_json::Value) -> Self {
+        NewIngredient {
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -191,7 +214,7 @@ impl DBWrapped for NewIngredient {
 }
 
 
-#[derive(Insertable)]
+#[derive(Insertable, Debug)]
 #[diesel(table_name = crate::schema::rating)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewRating {
@@ -200,6 +223,19 @@ pub struct NewRating {
 }
 
 impl DBWrapped for NewRating {
+    fn new(data: &serde_json::Value) -> Self {
+        NewRating {
+            score: match data["ratingValue"].as_i64() {
+                Some(score) => score as i32,
+                None => {
+                    println!("Nope");
+                    -1
+                }
+            },
+            amount: data["ratingCount"].as_i64().unwrap_or(-1) as i32,
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::rating::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -252,6 +288,18 @@ pub struct NewRecipe {
 }
 
 impl DBWrapped for NewRecipe {
+    fn new(data: &serde_json::Value) -> Self {
+        NewRecipe {
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+            cook_time: data["cook_time"].as_i64().unwrap_or(-1) as i32,
+            prep_time: data["prep_time"].as_i64().unwrap_or(-1) as i32,
+            yield_: data["yield"].as_i64().unwrap_or(-1) as i32,
+            author_id: -1,
+            rating_id: -1,
+            category_id: -1,
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::recipe::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -303,6 +351,15 @@ pub struct NewRecipeIngredient {
 }
 
 impl DBWrapped for NewRecipeIngredient {
+    fn new(data: &serde_json::Value) -> Self {
+        NewRecipeIngredient {
+            recipe_id: -1,
+            ingredient_id: -1,
+            unit_id: -1,
+            amount: data["amount"].as_str().unwrap_or("unknown").to_string(),
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::recipe_ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -351,6 +408,14 @@ pub struct NewStep {
 }
 
 impl DBWrapped for NewStep {
+    fn new(data: &serde_json::Value) -> Self {
+        NewStep {
+            recipe_id: -1,
+            number: data["number"].as_i64().unwrap_or(-1) as i32,
+            description: data["description"].as_str().unwrap_or("unknown").to_string(),
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::step::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
@@ -397,6 +462,12 @@ pub struct NewUnit {
 }
 
 impl DBWrapped for NewUnit {
+    fn new(data: &serde_json::Value) -> Self {
+        NewUnit {
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+        }
+    }
+
     fn exists(&self) -> Option<i32> {
         use crate::schema::unit::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
