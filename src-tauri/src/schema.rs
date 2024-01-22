@@ -34,7 +34,7 @@ diesel::table! {
 diesel::table! {
     rating (id) {
         id -> Integer,
-        score -> Integer,
+        score -> Float,
         amount -> Integer,
     }
 }

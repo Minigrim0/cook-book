@@ -31,14 +31,11 @@ impl DBWrapped for NewAuthor {
         use crate::schema::author::dsl::*;
 
         let connection: &mut SqliteConnection = &mut establish_connection();
-        match author
+        author
             .filter(url.eq(self.url.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(_err) => None  // Author was not found, does not exist
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -79,17 +76,11 @@ impl DBWrapped for NewCategory {
         use crate::schema::category::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match category
+        category
             .filter(name.eq(self.name.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting category: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -130,17 +121,11 @@ impl DBWrapped for NewCuisine {
         use crate::schema::cuisine::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match cuisine
+        cuisine
             .filter(name.eq(self.name.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting cuisine: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -181,17 +166,11 @@ impl DBWrapped for NewIngredient {
         use crate::schema::ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match ingredient
+        ingredient
             .filter(name.eq(self.name.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting ingredient: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -218,21 +197,25 @@ impl DBWrapped for NewIngredient {
 #[diesel(table_name = crate::schema::rating)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewRating {
-    pub score: i32,
+    pub score: f32,
     pub amount: i32,
 }
 
 impl DBWrapped for NewRating {
     fn new(data: &serde_json::Value) -> Self {
         NewRating {
-            score: match data["ratingValue"].as_i64() {
-                Some(score) => score as i32,
-                None => {
-                    println!("Nope");
-                    -1
-                }
-            },
-            amount: data["ratingCount"].as_i64().unwrap_or(-1) as i32,
+            score: data["ratingValue"]
+                .as_str()
+                .unwrap_or("-1")
+                .parse::<f32>()
+                .ok()
+                .unwrap_or(-1.0),
+            amount: data["ratingCount"]
+                .as_str()
+                .unwrap_or("-1")
+                .parse::<i32>()
+                .ok()
+                .unwrap_or(-1),
         }
     }
 
@@ -240,18 +223,12 @@ impl DBWrapped for NewRating {
         use crate::schema::rating::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match rating
+        rating
             .filter(score.eq(self.score.clone()))
             .filter(amount.eq(self.amount.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting rating: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -304,20 +281,14 @@ impl DBWrapped for NewRecipe {
         use crate::schema::recipe::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match recipe
+        recipe
             .filter(name.eq(self.name.clone()))
             .filter(cook_time.eq(self.cook_time.clone()))
             .filter(prep_time.eq(self.prep_time.clone()))
             .filter(yield_.eq(self.yield_.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting recipe: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -364,18 +335,12 @@ impl DBWrapped for NewRecipeIngredient {
         use crate::schema::recipe_ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match recipe_ingredient
+        recipe_ingredient
             .filter(recipe_id.eq(self.recipe_id.clone()))
             .filter(ingredient_id.eq(self.ingredient_id.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting recipe_ingredient: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -420,18 +385,12 @@ impl DBWrapped for NewStep {
         use crate::schema::step::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match step
+        step
             .filter(recipe_id.eq(self.recipe_id))
             .filter(number.eq(self.number))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting step: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {
@@ -472,17 +431,11 @@ impl DBWrapped for NewUnit {
         use crate::schema::unit::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        match unit
+        unit
             .filter(name.eq(self.name.clone()))
             .select(id)
             .first::<i32>(connection)
-        {
-            Ok(id_) => Some(id_),
-            Err(err) => {
-                println!("Error counting unit: {}", err.to_string());
-                None
-            }
-        }
+            .ok()
     }
 
     fn save(&self) -> Result<i32, diesel::result::Error> {

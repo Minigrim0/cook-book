@@ -10,7 +10,7 @@ CREATE TABLE author (
 
 CREATE TABLE rating (
     id INTEGER NOT NULL PRIMARY KEY,
-    score INTEGER NOT NULL,  -- Average rating
+    score FLOAT NOT NULL,  -- Average rating
     amount INTEGER NOT NULL  -- Amount of votes
 );
 

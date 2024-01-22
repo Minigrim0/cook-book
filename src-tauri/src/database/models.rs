@@ -42,7 +42,7 @@ pub struct Ingredient {
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Rating {
     pub id: i32,
-    pub score: i32,
+    pub score: f32,
     pub amount: i32,
 }
 
