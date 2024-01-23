@@ -282,11 +282,8 @@ impl DBWrapped for NewRecipe {
                 -1
             },
             yield_: data["recipeYield"]
-                .as_str()
-                .unwrap_or("-1")
-                .parse::<i32>()
-                .ok()
-                .unwrap_or(-1),
+                .as_i64()
+                .unwrap_or(-1) as i32,
             author_id: -1,
             rating_id: -1,
             category_id: -1,
