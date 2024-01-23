@@ -68,7 +68,7 @@ pub struct NewCategory {
 impl DBWrapped for NewCategory {
     fn new(data: &serde_json::Value) -> Self {
         NewCategory {
-            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+            name: data["recipeCategory"].as_str().unwrap_or("unknown").to_string(),
         }
     }
 
