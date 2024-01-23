@@ -5,6 +5,7 @@ use std::sync::{Arc, Mutex};
 use tauri::Window;
 use std::fs;
 
+pub mod utils;
 pub mod schema;
 pub mod database;
 pub mod parser;
@@ -29,9 +30,8 @@ fn load_path(data_path: &str, window: Window) -> String {
                     continue;
                 }
             };
-            match parser::json_parser::parse_recipe(path) {
-                Ok(msg) => println!("Recipe loaded {}", msg),
-                Err(msg) => println!("Error while loading recipe {}", msg)
+            if let Some(error) = parser::json_parser::parse_recipe(path).err() {
+                println!("Error while loading recipe: {}", error.to_string());
             }
 
             window

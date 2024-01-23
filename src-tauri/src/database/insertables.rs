@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 
+use crate::utils::iso8601_to_seconds;
 use crate::database::connection::establish_connection;
 
 pub trait DBWrapped {
@@ -268,9 +269,24 @@ impl DBWrapped for NewRecipe {
     fn new(data: &serde_json::Value) -> Self {
         NewRecipe {
             name: data["name"].as_str().unwrap_or("unknown").to_string(),
-            cook_time: data["cook_time"].as_i64().unwrap_or(-1) as i32,
-            prep_time: data["prep_time"].as_i64().unwrap_or(-1) as i32,
-            yield_: data["yield"].as_i64().unwrap_or(-1) as i32,
+            cook_time: if let Some(time) = data["cookTime"].as_str() {
+                if time != "" { iso8601_to_seconds(time.to_string()) }
+                else { -1 }
+            } else {
+                -1
+            },
+            prep_time: if let Some(time) = data["prepTime"].as_str() {
+                if time != "" { iso8601_to_seconds(time.to_string()) }
+                else { -1 }
+            } else {
+                -1
+            },
+            yield_: data["recipeYield"]
+                .as_str()
+                .unwrap_or("-1")
+                .parse::<i32>()
+                .ok()
+                .unwrap_or(-1),
             author_id: -1,
             rating_id: -1,
             category_id: -1,
