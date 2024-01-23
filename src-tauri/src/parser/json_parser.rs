@@ -14,7 +14,6 @@ fn parse_author(recipe: &serde_json::Value) -> Option<i32> {
         } else {
             match recipe_author.save() {
                 Ok(id) => {
-                    println!("New author {} saved with id {}", author["name"], id);
                     Some(id)
                 },
                 Err(e) => {
@@ -36,7 +35,6 @@ fn parse_rating(recipe: &serde_json::Value) -> Option<i32> {
         } else {
             match rating.save() {
                 Ok(id) => {
-                    println!("New rating saved with id {}", id);
                     Some(id)
                 },
                 Err(e) => {
@@ -58,7 +56,6 @@ fn parse_category(recipe: &serde_json::Value) -> Option<i32> {
     } else {
         match category.save() {
             Ok(id) => {
-                println!("New category: {}", category.name);
                 Some(id)
             },
             Err(e) => {
@@ -97,6 +94,21 @@ pub fn parse_recipe(path: &DirEntry) -> Result<String, String> {
     if let Some(id) = cat_id {
         recipe.category_id = id;
     }
+
+    let recipe_id = if let Some(id) = recipe.exists() {
+        id
+    } else {
+        match recipe.save() {
+            Ok(id) => {
+                id
+            },
+            Err(e) => {
+                return Err(format!("Unable to save recipe {}; {}", recipe.name, e.to_string()));
+            }
+        }
+    };
+
+    // Parse the ingredients
 
     Ok(file_path.to_str().unwrap().to_string())
 }
