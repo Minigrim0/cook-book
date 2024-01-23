@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::sync::{Arc, Mutex};
-use tauri::Window;
+use tauri::{Window, Manager};
 use std::fs;
 
 pub mod utils;
@@ -52,6 +52,17 @@ fn load_path(data_path: &str, window: Window) -> String {
 
 fn main() {
     tauri::Builder::default()
+        .setup(|app| {
+            let splashscreen_window = app.get_window("splashscreen").unwrap();
+            let main_window = app.get_window("main").unwrap();
+            // we perform the initialization code on a new task so the app doesn't freeze
+            tauri::async_runtime::spawn(async move {
+                database::init::init_database();
+                splashscreen_window.close().unwrap();
+                main_window.show().unwrap();
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![load_path])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
