@@ -71,6 +71,7 @@ pub struct RecipeIngredient {
     pub ingredient_id: i32,
     pub unit_id: i32,
     pub amount: f32,
+    pub details: Option<String>,
 }
 
 

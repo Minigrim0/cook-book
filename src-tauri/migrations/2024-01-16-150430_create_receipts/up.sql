@@ -41,7 +41,8 @@ CREATE TABLE recipe_ingredient (
     recipe_id INTEGER NOT NULL REFERENCES recipe(id),
     ingredient_id INTEGER NOT NULL REFERENCES ingredient(id),
     unit_id INTEGER NOT NULL REFERENCES unit(id),
-    amount FLOAT NOT NULL
+    amount FLOAT NOT NULL,
+    details VARCHAR
 );
 
 CREATE TABLE step (

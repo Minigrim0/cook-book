@@ -332,6 +332,7 @@ pub struct NewRecipeIngredient {
     pub ingredient_id: i32,
     pub unit_id: i32,
     pub amount: f32,
+    pub details: Option<String>,
 }
 
 impl DBWrapped for NewRecipeIngredient {
@@ -341,6 +342,7 @@ impl DBWrapped for NewRecipeIngredient {
             ingredient_id: -1,
             unit_id: -1,
             amount: data["amount"].as_f64().unwrap_or(-1.0) as f32,
+            details: data["details"].as_str().map(|s| s.to_string()),
         }
     }
 
