@@ -68,6 +68,7 @@ diesel::table! {
         ingredient_id -> Integer,
         unit_id -> Integer,
         amount -> Float,
+        details -> Nullable<Text>,
     }
 }
 
