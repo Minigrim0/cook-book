@@ -67,7 +67,7 @@ diesel::table! {
         recipe_id -> Integer,
         ingredient_id -> Integer,
         unit_id -> Integer,
-        amount -> Text,
+        amount -> Float,
     }
 }
 

@@ -70,7 +70,7 @@ pub struct RecipeIngredient {
     pub recipe_id: i32,
     pub ingredient_id: i32,
     pub unit_id: i32,
-    pub amount: String,
+    pub amount: f32,
 }
 
 
