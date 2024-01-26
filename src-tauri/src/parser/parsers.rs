@@ -1,6 +1,5 @@
-use regex::Regex;
-
-use crate::database::insertables::{NewCategory, NewIngredient, NewRating, NewAuthor, DBWrapped};
+use serde_json::json;
+use crate::database::insertables::{NewCategory, NewStep, NewRating, NewAuthor, DBWrapped};
 
 use super::natural::parse_natural_ingredient;
 
@@ -80,5 +79,21 @@ pub fn parse_author(recipe: &serde_json::Value) -> Option<i32> {
         }
     } else {
         None
+    }
+}
+
+
+pub fn parse_instructions(instructions: &serde_json::Value, recipe_id: i32) {
+    let mut step_number = 0;
+    for instruction in instructions.as_array().unwrap().iter() {
+        let step = NewStep::new(&json!({
+            "r_id": recipe_id,
+            "step": step_number,
+            "data": instruction
+        }));
+        step_number += 1;
+        if let Err(e) = step.save() {
+            println!("Error while creating step: {}", e.to_string());
+        }
     }
 }

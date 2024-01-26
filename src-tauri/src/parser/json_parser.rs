@@ -6,7 +6,8 @@ use crate::parser::parsers::{
     parse_author,
     parse_rating,
     parse_category,
-    parse_ingredients
+    parse_ingredients,
+    parse_instructions,
 };
 
 pub fn parse_recipe(path: &DirEntry) -> Result<String, String> {
@@ -56,6 +57,13 @@ pub fn parse_recipe(path: &DirEntry) -> Result<String, String> {
         parse_ingredients(ingredients, recipe_id);
     } else {
         return Err("Unable to parse ingredients, no key 'recipeIngredient' found.".to_string());
+    }
+
+    // Parse the steps
+    if let Some(steps) = recipe_json.get("recipeInstructions") {
+        parse_instructions(steps, recipe_id);
+    } else {
+        return Err("Unable to parse instructions, no key 'recipeInstructions' found.".to_string());
     }
 
     Ok(file_path.to_str().unwrap().to_string())
