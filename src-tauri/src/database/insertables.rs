@@ -333,6 +333,7 @@ pub struct NewRecipeIngredient {
     pub unit_id: i32,
     pub amount: f32,
     pub details: Option<String>,
+    pub full: Option<String>,
 }
 
 impl DBWrapped for NewRecipeIngredient {
@@ -343,6 +344,7 @@ impl DBWrapped for NewRecipeIngredient {
             unit_id: -1,
             amount: data["amount"].as_f64().unwrap_or(-1.0) as f32,
             details: data["details"].as_str().map(|s| s.to_string()),
+            full: Some("".to_string()),
         }
     }
 
@@ -390,9 +392,9 @@ pub struct NewStep {
 impl DBWrapped for NewStep {
     fn new(data: &serde_json::Value) -> Self {
         NewStep {
-            recipe_id: -1,
-            number: data["number"].as_i64().unwrap_or(-1) as i32,
-            description: data["description"].as_str().unwrap_or("unknown").to_string(),
+            recipe_id: data["r_id"].as_i64().unwrap_or(-1) as i32,
+            number: data["step"].as_i64().unwrap_or(-1) as i32,
+            description: data["data"].as_str().unwrap_or("unknown").to_string(),
         }
     }
 

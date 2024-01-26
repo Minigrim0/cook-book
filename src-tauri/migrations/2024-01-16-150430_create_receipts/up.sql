@@ -26,8 +26,8 @@ INSERT INTO unit (name) VALUES
     ('lb'),
     ('l'),
     ('dl'),
-    ('tblsp'),
-    ('tsp'),
+    ('teaspoon'),
+    ('tablespoon'),
     ('ml'),
     ('cup');
 
@@ -42,7 +42,8 @@ CREATE TABLE recipe_ingredient (
     ingredient_id INTEGER NOT NULL REFERENCES ingredient(id),
     unit_id INTEGER NOT NULL REFERENCES unit(id),
     amount FLOAT NOT NULL,
-    details VARCHAR
+    details VARCHAR,
+    full VARCHAR
 );
 
 CREATE TABLE step (
