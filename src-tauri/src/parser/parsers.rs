@@ -2,6 +2,8 @@ use regex::Regex;
 
 use crate::database::insertables::{NewCategory, NewIngredient, NewRating, NewAuthor, DBWrapped};
 
+use super::natural::parse_natural_ingredient;
+
 
 pub fn parse_rating(recipe: &serde_json::Value) -> Option<i32> {
     if let Some(rating) = recipe.get("aggregateRating") {
@@ -28,7 +30,14 @@ pub fn parse_rating(recipe: &serde_json::Value) -> Option<i32> {
 pub fn parse_ingredients(natural_ingredients: &serde_json::Value, recipe_id: i32) {
     // Loop over ingredients
     for ingredient in natural_ingredients.as_array().unwrap().iter() {
-        println!("Working on {}", ingredient.as_str().unwrap_or("oops"));
+        if let Some(ingredient_string) = ingredient.as_str() {
+            if let Some(mut recipe_ingredient) =  parse_natural_ingredient(ingredient_string) {
+                recipe_ingredient.recipe_id = recipe_id;
+                if let Err(e) = recipe_ingredient.save() {
+                    println!("Error while creating recipe ingredient: {}", e.to_string());
+                }
+            }
+        }
     }
 }
 
