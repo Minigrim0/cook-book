@@ -45,15 +45,7 @@ pub fn parse_category(recipe: &serde_json::Value) -> Option<i32> {
     if let Some(id_) = category.exists() {
         Some(id_)
     } else {
-        match category.save() {
-            Ok(id) => {
-                Some(id)
-            },
-            Err(e) => {
-                println!("Error while creating new category '{}': {}", category.name, e.to_string());
-                None
-            }
-        }
+        category.save().ok()
     }
 }
 
@@ -64,19 +56,7 @@ pub fn parse_author(recipe: &serde_json::Value) -> Option<i32> {
     if let Some(authors) = recipe.get("author") {
         let author = &authors[0];
         let recipe_author = NewAuthor::new(author);
-        if let Some(id_) = recipe_author.exists() {
-            Some(id_)
-        } else {
-            match recipe_author.save() {
-                Ok(id) => {
-                    Some(id)
-                },
-                Err(e) => {
-                    println!("Error while creating author {}: {}", author["name"], e.to_string());
-                    None
-                }
-            }
-        }
+        recipe_author.exists().or_else(|| recipe_author.save().ok())
     } else {
         None
     }
