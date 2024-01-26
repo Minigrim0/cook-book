@@ -76,6 +76,7 @@ pub fn parse_natural_ingredient(line: &str) -> Option<NewRecipeIngredient> {
         },
         // alt: alt.map_or(None, |s| Some(s.to_string())),
         details: details.map_or(None, |s| Some(s.to_string())),
+        full: Some(line.to_string()),
     };
 
     Some(recipe_ingredient)
