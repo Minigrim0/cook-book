@@ -338,8 +338,16 @@ pub struct NewRecipeIngredient {
 
 impl DBWrapped for NewRecipeIngredient {
     fn new(data: &serde_json::Value) -> Self {
+        if let Some(ingredient_string) = data["data"].as_str() {
+            if let Some(mut recipe_ingredient) =  parse_natural_ingredient(ingredient_string) {
+                if let Err(e) = recipe_ingredient.save() {
+                    println!("Error while creating recipe ingredient: {}", e.to_string());
+                }
+            }
+        }
+
         NewRecipeIngredient {
-            recipe_id: -1,
+            recipe_id: data["r_id"].as_i64().unwrap_or(-1) as i32,
             ingredient_id: -1,
             unit_id: -1,
             amount: data["amount"].as_f64().unwrap_or(-1.0) as f32,

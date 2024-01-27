@@ -7,6 +7,34 @@ fn normalize_units(line: &str) -> &str {
     ""
 }
 
+pub fn get_or_create_ingredient(name: Option<&str>, unit: Option<&str>) -> Option<i32> {
+    let new_ingredient = NewIngredient {
+        name: match name {
+            Some(name) => if name.to_string() == "" {
+                match unit {
+                    Some(unit) => unit.to_string(),
+                    None => "unknown".to_string(),
+                }
+            } else {
+                name.to_string()
+            },
+            None => "unknown".to_string(),
+        },
+    };
+
+    if let Some(id) = new_ingredient.exists() {
+        Some(id)
+    } else {
+        match new_ingredient.save() {
+            Ok(id) => Some(id),
+            Err(e) => {
+                println!("Error while creating new ingredient '{}': {}", new_ingredient.name, e.to_string());
+                return None;
+            }
+        }
+    }
+}
+
 pub fn parse_natural_ingredient(line: &str) -> Option<NewRecipeIngredient> {
     let basic_re = Regex::new(r"^(?P<amount>\d+\.?\d*) (?:\((?P<alt>.*)\))?\s*(?P<unit>\w+)(?:\s*(?P<name>[.[^,\n]]*))?(?:,(?P<details>.*))?$").unwrap();
     let basic_match = basic_re.captures(line);
@@ -34,17 +62,7 @@ pub fn parse_natural_ingredient(line: &str) -> Option<NewRecipeIngredient> {
         },
     };
 
-    let ingredient_id = if let Some(id) = new_ingredient.exists() {
-        id
-    } else {
-        match new_ingredient.save() {
-            Ok(id) => id,
-            Err(e) => {
-                println!("Error while creating new ingredient '{}': {}", new_ingredient.name, e.to_string());
-                return None;
-            }
-        }
-    };
+    let ingredient_id = get_or_create_ingredient(name, unit).unwrap_or(-1);
 
     let new_unit = NewUnit {
         name: if name.unwrap_or("").to_string() == "" {  // If there is no name, unit is piece
