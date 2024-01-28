@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use crate::database::{wrapper::DBWrapped, connection::establish_connection};
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::author)]
+#[diesel(table_name = crate::database::schema::author)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewAuthor {
     pub type_: String,
@@ -21,7 +21,7 @@ impl DBWrapped for NewAuthor {
     }
 
     fn exists(&self) -> Option<i32> {
-        use crate::schema::author::dsl::*;
+        use crate::database::schema::author::dsl::*;
 
         let connection: &mut SqliteConnection = &mut establish_connection();
         author
@@ -34,7 +34,7 @@ impl DBWrapped for NewAuthor {
     fn save(&self) -> Result<i32, diesel::result::Error> {
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        diesel::insert_into(crate::schema::author::table)
+        diesel::insert_into(crate::database::schema::author::table)
             .values(self)
             .execute(connection)
             .expect("Error saving new author");

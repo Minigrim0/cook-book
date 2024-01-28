@@ -4,7 +4,7 @@ use crate::database::{wrapper::DBWrapped, connection::establish_connection};
 use crate::utils::iso8601_to_seconds;
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::recipe)]
+#[diesel(table_name = crate::database::schema::recipe)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewRecipe {
     pub name: String,
@@ -42,7 +42,7 @@ impl DBWrapped for NewRecipe {
     }
 
     fn exists(&self) -> Option<i32> {
-        use crate::schema::recipe::dsl::*;
+        use crate::database::schema::recipe::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         recipe
@@ -58,7 +58,7 @@ impl DBWrapped for NewRecipe {
     fn save(&self) -> Result<i32, diesel::result::Error> {
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        diesel::insert_into(crate::schema::recipe::table)
+        diesel::insert_into(crate::database::schema::recipe::table)
             .values(self)
             .execute(connection)
             .expect("Error saving new recipe");

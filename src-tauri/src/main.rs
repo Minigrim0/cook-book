@@ -6,7 +6,6 @@ use tauri::{Window, Manager};
 use std::fs;
 
 pub mod utils;
-pub mod schema;
 pub mod database;
 pub mod parser;
 

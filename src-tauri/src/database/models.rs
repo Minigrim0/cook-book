@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::author)]
+#[diesel(table_name = crate::database::schema::author)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Author {
     pub id: i32,
@@ -11,7 +11,7 @@ pub struct Author {
 }
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::category)]
+#[diesel(table_name = crate::database::schema::category)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Category {
     pub id: i32,
@@ -20,7 +20,7 @@ pub struct Category {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::cuisine)]
+#[diesel(table_name = crate::database::schema::cuisine)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Cuisine {
     pub id: i32,
@@ -29,7 +29,7 @@ pub struct Cuisine {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::ingredient)]
+#[diesel(table_name = crate::database::schema::ingredient)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Ingredient {
     pub id: i32,
@@ -38,7 +38,7 @@ pub struct Ingredient {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::rating)]
+#[diesel(table_name = crate::database::schema::rating)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Rating {
     pub id: i32,
@@ -48,7 +48,7 @@ pub struct Rating {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::recipe)]
+#[diesel(table_name = crate::database::schema::recipe)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Recipe {
     pub id: i32,
@@ -63,7 +63,7 @@ pub struct Recipe {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::recipe_ingredient)]
+#[diesel(table_name = crate::database::schema::recipe_ingredient)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct RecipeIngredient {
     pub id: i32,
@@ -76,7 +76,7 @@ pub struct RecipeIngredient {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::step)]
+#[diesel(table_name = crate::database::schema::step)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Step {
     pub id: i32,
@@ -87,7 +87,7 @@ pub struct Step {
 
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::unit)]
+#[diesel(table_name = crate::database::schema::unit)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Unit {
     pub id: i32,

@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use crate::database::{wrapper::DBWrapped, connection::establish_connection};
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::category)]
+#[diesel(table_name = crate::database::schema::category)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewCategory {
     pub name: String,
@@ -17,7 +17,7 @@ impl DBWrapped for NewCategory {
     }
 
     fn exists(&self) -> Option<i32> {
-        use crate::schema::category::dsl::*;
+        use crate::database::schema::category::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         category
@@ -30,7 +30,7 @@ impl DBWrapped for NewCategory {
     fn save(&self) -> Result<i32, diesel::result::Error> {
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        diesel::insert_into(crate::schema::category::table)
+        diesel::insert_into(crate::database::schema::category::table)
             .values(self)
             .execute(connection)
             .expect("Error saving new category");

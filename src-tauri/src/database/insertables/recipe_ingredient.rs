@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use crate::database::{wrapper::DBWrapped, connection::establish_connection};
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::recipe_ingredient)]
+#[diesel(table_name = crate::database::schema::recipe_ingredient)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewRecipeIngredient {
     pub recipe_id: i32,
@@ -27,7 +27,7 @@ impl DBWrapped for NewRecipeIngredient {
     }
 
     fn exists(&self) -> Option<i32> {
-        use crate::schema::recipe_ingredient::dsl::*;
+        use crate::database::schema::recipe_ingredient::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         recipe_ingredient
@@ -41,7 +41,7 @@ impl DBWrapped for NewRecipeIngredient {
     fn save(&self) -> Result<i32, diesel::result::Error> {
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        diesel::insert_into(crate::schema::recipe_ingredient::table)
+        diesel::insert_into(crate::database::schema::recipe_ingredient::table)
             .values(self)
             .execute(connection)
             .expect("Error saving new recipe <-> ingredient");

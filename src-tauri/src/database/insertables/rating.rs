@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use crate::database::{wrapper::DBWrapped, connection::establish_connection};
 
 #[derive(Insertable, Debug)]
-#[diesel(table_name = crate::schema::rating)]
+#[diesel(table_name = crate::database::schema::rating)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct NewRating {
     pub score: f32,
@@ -29,7 +29,7 @@ impl DBWrapped for NewRating {
     }
 
     fn exists(&self) -> Option<i32> {
-        use crate::schema::rating::dsl::*;
+        use crate::database::schema::rating::dsl::*;
         let connection: &mut SqliteConnection = &mut establish_connection();
 
         rating
@@ -43,7 +43,7 @@ impl DBWrapped for NewRating {
     fn save(&self) -> Result<i32, diesel::result::Error> {
         let connection: &mut SqliteConnection = &mut establish_connection();
 
-        diesel::insert_into(crate::schema::rating::table)
+        diesel::insert_into(crate::database::schema::rating::table)
             .values(self)
             .execute(connection)
             .expect("Error saving new rating");
