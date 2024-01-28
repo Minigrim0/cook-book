@@ -159,7 +159,11 @@ pub struct NewIngredient {
 impl DBWrapped for NewIngredient {
     fn new(data: &serde_json::Value) -> Self {
         NewIngredient {
-            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+            name: if data["name"].as_str().unwrap_or("").to_string() == "" {
+                data["unit"].as_str().unwrap_or("unknown").to_string()
+            } else {
+                data["name"].as_str().unwrap_or("unknown").to_string()
+            }
         }
     }
 
@@ -338,21 +342,13 @@ pub struct NewRecipeIngredient {
 
 impl DBWrapped for NewRecipeIngredient {
     fn new(data: &serde_json::Value) -> Self {
-        if let Some(ingredient_string) = data["data"].as_str() {
-            if let Some(mut recipe_ingredient) =  parse_natural_ingredient(ingredient_string) {
-                if let Err(e) = recipe_ingredient.save() {
-                    println!("Error while creating recipe ingredient: {}", e.to_string());
-                }
-            }
-        }
-
         NewRecipeIngredient {
             recipe_id: data["r_id"].as_i64().unwrap_or(-1) as i32,
-            ingredient_id: -1,
-            unit_id: -1,
+            ingredient_id: data["i_id"].as_i64().unwrap_or(-1) as i32,
+            unit_id: data["u_id"].as_i64().unwrap_or(-1) as i32,
             amount: data["amount"].as_f64().unwrap_or(-1.0) as f32,
             details: data["details"].as_str().map(|s| s.to_string()),
-            full: Some("".to_string()),
+            full: data["full"].as_str().map(|s| s.to_string()),
         }
     }
 
@@ -448,7 +444,11 @@ pub struct NewUnit {
 impl DBWrapped for NewUnit {
     fn new(data: &serde_json::Value) -> Self {
         NewUnit {
-            name: data["name"].as_str().unwrap_or("unknown").to_string(),
+            name: if data["name"].as_str().unwrap_or("").to_string() == "" {  // If there is no name, unit is piece
+                "piece".to_string()
+            } else {
+                data["unit"].as_str().unwrap_or("unknown").to_string()
+            },
         }
     }
 
