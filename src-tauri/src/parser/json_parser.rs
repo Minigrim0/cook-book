@@ -1,7 +1,8 @@
 //! This module contains the functions for parsing JSON files into the database.
 use std::fs::DirEntry;
 
-use crate::database::insertables::{DBWrapped, NewRecipe};
+use crate::database::{insertables::recipe::NewRecipe, wrapper::DBWrapped};
+
 use crate::parser::parsers::{
     parse_author,
     parse_rating,

@@ -1,11 +1,22 @@
 use serde_json::json;
 use regex::Regex;
 
-use crate::database::insertables::{DBWrapped, NewIngredient, NewRecipeIngredient, NewUnit};
+use crate::database::{
+    insertables::{
+        ingredient::NewIngredient,
+        recipe_ingredient::NewRecipeIngredient,
+        unit::NewUnit
+    },
+    wrapper::DBWrapped
+};
 
-fn normalize_units(line: &str) -> &str {
-    // line.replace(from, to)
-    ""
+fn normalize_units(line: &str) -> String {
+    let mut new_line = line.replace("tbsp", "tablespoon");
+    new_line = new_line.replace("tsp", "teaspoon");
+
+    // TODO: remove plurals
+
+    new_line
 }
 
 pub fn get_or_create_ingredient(name: Option<&str>, unit: Option<&str>) -> Option<i32> {
@@ -48,8 +59,11 @@ fn get_or_create_unit(name: Option<&str>, unit: Option<&str>) -> Option<i32> {
 
 pub fn parse_natural_ingredient(line: &str, r_id: i32) -> Option<NewRecipeIngredient> {
     let basic_re = Regex::new(r"^(?P<amount>\d+\.?\d*) (?:\((?P<alt>.*)\))?\s*(?P<unit>\w+)(?:\s*(?P<name>[.[^,\n]]*))?(?:,(?P<details>.*))?$").unwrap();
-    let basic_match = basic_re.captures(line);
+    let new_line = normalize_units(line);
+    let basic_match = basic_re.captures(new_line.as_str());
     if basic_match.is_none() {
+        // TODO: create 'error' models with all data to ask user later
+
         return None;
     }
 

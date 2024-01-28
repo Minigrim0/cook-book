@@ -1,5 +1,13 @@
 use serde_json::json;
-use crate::database::insertables::{NewCategory, NewStep, NewRating, NewAuthor, DBWrapped};
+use crate::database::{
+    insertables::{
+        author::NewAuthor,
+        category::NewCategory,
+        rating::NewRating,
+        step::NewStep,
+    },
+    wrapper::DBWrapped
+};
 
 use super::natural::parse_natural_ingredient;
 
