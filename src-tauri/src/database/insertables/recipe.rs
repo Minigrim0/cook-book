@@ -14,6 +14,7 @@ pub struct NewRecipe {
     pub author_id: i32,
     pub rating_id: i32,
     pub category_id: i32,
+    pub image: Option<String>,
 }
 
 impl DBWrapped for NewRecipe {
@@ -38,6 +39,7 @@ impl DBWrapped for NewRecipe {
             author_id: -1,
             rating_id: -1,
             category_id: -1,
+            image: data["image"].as_str().map_or(None, |x| Some(x.to_string()))
         }
     }
 
