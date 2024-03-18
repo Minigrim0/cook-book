@@ -1,5 +1,5 @@
 //! This module contains the functions for parsing JSON files into the database.
-use std::fs::DirEntry;
+use std::path::PathBuf;
 
 use crate::database::{insertables::recipe::NewRecipe, wrapper::DBWrapped};
 
@@ -11,9 +11,9 @@ use crate::parser::parsers::{
     parse_instructions,
 };
 
-pub fn parse_recipe(path: &DirEntry) -> Result<String, String> {
+pub fn parse_recipe(path: &PathBuf) -> Result<String, String> {
     // Open the file recipe.json and load it
-    let file_path = path.path().join(r"recipe.json");
+    let file_path = path.join(r"recipe.json");
     let file = match std::fs::File::open(file_path.clone()) {
         Ok(file) => file,
         Err(err) => return Err(err.to_string())
