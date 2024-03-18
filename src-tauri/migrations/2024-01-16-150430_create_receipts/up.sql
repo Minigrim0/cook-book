@@ -77,5 +77,6 @@ CREATE TABLE recipe (
     yield INTEGER NOT NULL,  -- Yield of the recipe
     author_id INTEGER NOT NULL REFERENCES author(id),
     rating_id INTEGER NOT NULL REFERENCES rating(id),
-    category_id INTEGER NOT NULL REFERENCES category(id)
+    category_id INTEGER NOT NULL REFERENCES category(id),
+    image VARCHAR
 );

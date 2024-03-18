@@ -59,6 +59,7 @@ pub struct Recipe {
     pub author_id: i32,
     pub rating_id: i32,
     pub category_id: i32,
+    pub image: Option<String>,
 }
 
 

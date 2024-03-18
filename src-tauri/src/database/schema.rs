@@ -50,6 +50,7 @@ diesel::table! {
         author_id -> Integer,
         rating_id -> Integer,
         category_id -> Integer,
+        image -> Nullable<Text>,
     }
 }
 
