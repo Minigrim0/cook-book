@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
-use crate::database::{wrapper::DBWrapped, connection::establish_connection};
+use crate::database::insertables::DBWrapped;
+use crate::SharedDatabasePool;
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::database::schema::category)]
@@ -12,36 +13,37 @@ pub struct NewCategory {
 impl DBWrapped for NewCategory {
     fn new(data: &serde_json::Value) -> Self {
         NewCategory {
-            name: data["recipeCategory"].as_str().unwrap_or("unknown").to_string(),
+            name: data["recipeCategory"]
+                .as_str()
+                .unwrap_or("unknown")
+                .to_string(),
         }
     }
 
-    fn exists(&self) -> Option<i32> {
+    fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
         use crate::database::schema::category::dsl::*;
-        let connection: &mut SqliteConnection = &mut establish_connection();
+        let conn = &mut pool.get().unwrap();
 
         category
             .filter(name.eq(self.name.clone()))
             .select(id)
-            .first::<i32>(connection)
+            .first::<i32>(conn)
             .ok()
     }
 
-    fn save(&self) -> Result<i32, diesel::result::Error> {
-        let connection: &mut SqliteConnection = &mut establish_connection();
+    fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
+        let conn = &mut pool.get().unwrap();
 
         diesel::insert_into(crate::database::schema::category::table)
             .values(self)
-            .execute(connection)
+            .execute(conn)
             .expect("Error saving new category");
 
-            let last_id: i32 = diesel::select(
-                diesel::dsl::sql::<diesel::sql_types::Integer>(
-                    "last_insert_rowid()"
-                )
-            )
-                .get_result(connection)
-                .expect("Error getting last insert rowid");
+        let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
+            "last_insert_rowid()",
+        ))
+        .get_result(conn)
+        .expect("Error getting last insert rowid");
         Ok(last_id)
     }
 }

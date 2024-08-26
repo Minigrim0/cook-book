@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 
-use crate::database::{wrapper::DBWrapped, connection::establish_connection};
+use crate::database::insertables::DBWrapped;
 use crate::utils::iso8601_to_seconds;
+use crate::SharedDatabasePool;
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::database::schema::recipe)]
@@ -22,30 +23,34 @@ impl DBWrapped for NewRecipe {
         NewRecipe {
             name: data["name"].as_str().unwrap_or("unknown").to_string(),
             cook_time: if let Some(time) = data["cookTime"].as_str() {
-                if time != "" { iso8601_to_seconds(time.to_string()) }
-                else { -1 }
+                if time != "" {
+                    iso8601_to_seconds(time.to_string())
+                } else {
+                    -1
+                }
             } else {
                 -1
             },
             prep_time: if let Some(time) = data["prepTime"].as_str() {
-                if time != "" { iso8601_to_seconds(time.to_string()) }
-                else { -1 }
+                if time != "" {
+                    iso8601_to_seconds(time.to_string())
+                } else {
+                    -1
+                }
             } else {
                 -1
             },
-            yield_: data["recipeYield"]
-                .as_i64()
-                .unwrap_or(-1) as i32,
+            yield_: data["recipeYield"].as_i64().unwrap_or(-1) as i32,
             author_id: -1,
             rating_id: -1,
             category_id: -1,
-            image: data["image"].as_str().map_or(None, |x| Some(x.to_string()))
+            image: data["image"].as_str().map_or(None, |x| Some(x.to_string())),
         }
     }
 
-    fn exists(&self) -> Option<i32> {
+    fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
         use crate::database::schema::recipe::dsl::*;
-        let connection: &mut SqliteConnection = &mut establish_connection();
+        let conn = &mut pool.get().unwrap();
 
         recipe
             .filter(name.eq(self.name.clone()))
@@ -53,25 +58,23 @@ impl DBWrapped for NewRecipe {
             .filter(prep_time.eq(self.prep_time.clone()))
             .filter(yield_.eq(self.yield_.clone()))
             .select(id)
-            .first::<i32>(connection)
+            .first::<i32>(conn)
             .ok()
     }
 
-    fn save(&self) -> Result<i32, diesel::result::Error> {
-        let connection: &mut SqliteConnection = &mut establish_connection();
+    fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
+        let conn = &mut pool.get().unwrap();
 
         diesel::insert_into(crate::database::schema::recipe::table)
             .values(self)
-            .execute(connection)
+            .execute(conn)
             .expect("Error saving new recipe");
 
-            let last_id: i32 = diesel::select(
-                diesel::dsl::sql::<diesel::sql_types::Integer>(
-                    "last_insert_rowid()"
-                )
-            )
-                .get_result(connection)
-                .expect("Error getting last insert rowid");
+        let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
+            "last_insert_rowid()",
+        ))
+        .get_result(conn)
+        .expect("Error getting last insert rowid");
         Ok(last_id)
     }
 }

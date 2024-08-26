@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
-use crate::database::{wrapper::DBWrapped, connection::establish_connection};
+use crate::database::insertables::DBWrapped;
+use crate::SharedDatabasePool;
 
 #[derive(Insertable, Debug)]
 #[diesel(table_name = crate::database::schema::rating)]
@@ -28,34 +29,31 @@ impl DBWrapped for NewRating {
         }
     }
 
-    fn exists(&self) -> Option<i32> {
+    fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
         use crate::database::schema::rating::dsl::*;
-        let connection: &mut SqliteConnection = &mut establish_connection();
+        let conn = &mut pool.get().unwrap();
 
         rating
             .filter(score.eq(self.score.clone()))
             .filter(amount.eq(self.amount.clone()))
             .select(id)
-            .first::<i32>(connection)
+            .first::<i32>(conn)
             .ok()
     }
 
-    fn save(&self) -> Result<i32, diesel::result::Error> {
-        let connection: &mut SqliteConnection = &mut establish_connection();
+    fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
+        let conn = &mut pool.get().unwrap();
 
         diesel::insert_into(crate::database::schema::rating::table)
             .values(self)
-            .execute(connection)
+            .execute(conn)
             .expect("Error saving new rating");
 
-            let last_id: i32 = diesel::select(
-                diesel::dsl::sql::<diesel::sql_types::Integer>(
-                    "last_insert_rowid()"
-                )
-            )
-                .get_result(connection)
-                .expect("Error getting last insert rowid");
+        let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
+            "last_insert_rowid()",
+        ))
+        .get_result(conn)
+        .expect("Error getting last insert rowid");
         Ok(last_id)
     }
 }
-

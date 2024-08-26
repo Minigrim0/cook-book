@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
-use crate::database::{wrapper::DBWrapped, connection::establish_connection};
+use crate::database::insertables::DBWrapped;
+use crate::SharedDatabasePool;
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::database::schema::cuisine)]
@@ -16,32 +17,30 @@ impl DBWrapped for NewCuisine {
         }
     }
 
-    fn exists(&self) -> Option<i32> {
+    fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
         use crate::database::schema::cuisine::dsl::*;
-        let connection: &mut SqliteConnection = &mut establish_connection();
+        let conn = &mut pool.get().unwrap();
 
         cuisine
             .filter(name.eq(self.name.clone()))
             .select(id)
-            .first::<i32>(connection)
+            .first::<i32>(conn)
             .ok()
     }
 
-    fn save(&self) -> Result<i32, diesel::result::Error> {
-        let connection: &mut SqliteConnection = &mut establish_connection();
+    fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
+        let conn = &mut pool.get().unwrap();
 
         diesel::insert_into(crate::database::schema::cuisine::table)
             .values(self)
-            .execute(connection)
+            .execute(conn)
             .expect("Error saving new cuisine");
 
-            let last_id: i32 = diesel::select(
-                diesel::dsl::sql::<diesel::sql_types::Integer>(
-                    "last_insert_rowid()"
-                )
-            )
-                .get_result(connection)
-                .expect("Error getting last insert rowid");
+        let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
+            "last_insert_rowid()",
+        ))
+        .get_result(conn)
+        .expect("Error getting last insert rowid");
         Ok(last_id)
     }
 }
