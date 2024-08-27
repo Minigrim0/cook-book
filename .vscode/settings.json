@@ -1,6 +1,0 @@
-{
-  "emmet.includeLanguages": {
-    "rust": "html"
-},
-"rust-analyzer.showUnlinkedFileNotification": false
-}

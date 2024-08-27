@@ -67,7 +67,7 @@ fn load_path(data_path: &str, window: Window) -> String {
                         "loading://starting",
                         serde_json::json!({
                             "path": path.to_str().unwrap(),
-                            "id": index,
+                            "id": index as i32,
                             "total": count
                         }),
                     )
@@ -81,7 +81,7 @@ fn load_path(data_path: &str, window: Window) -> String {
                         .emit(
                             "loading://error",
                             serde_json::json!({
-                                "id": index,
+                                "id": index as i32,
                                 "error": error.to_string()
                             }),
                         )
@@ -93,7 +93,7 @@ fn load_path(data_path: &str, window: Window) -> String {
                         .emit(
                             "loading://completed",
                             serde_json::json!({
-                                "id": index,
+                                "id": index as i32,
                             }),
                         )
                         .unwrap();
