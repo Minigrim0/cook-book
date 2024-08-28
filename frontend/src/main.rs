@@ -4,7 +4,10 @@ use web_sys::window;
 use yew::prelude::*;
 
 mod footer;
+mod sidebar;
+mod recipes_tree;
 use footer::FooterComponent;
+use sidebar::SideBarComponent;
 
 #[wasm_bindgen(module = "/public/glue.js")]
 extern "C" {
@@ -19,9 +22,12 @@ fn main() {
 #[function_component]
 pub fn App() -> Html {
     html! {
-        <div>
-            <h2 class={"heading"}>{"Hello, World!"}</h2>
-            <FooterComponent />
+        <div class={"content"}>
+            <SideBarComponent />
+            <div class="mainview">
+                <h2 class={"heading"}>{"Hello, World!"}</h2>
+                <FooterComponent />
+            </div>
         </div>
     }
 }
