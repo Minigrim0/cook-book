@@ -6,8 +6,12 @@ use yew::prelude::*;
 mod footer;
 mod sidebar;
 mod recipes_tree;
+mod central;
+mod header;
+use header::HeaderComponent;
 use footer::FooterComponent;
 use sidebar::SideBarComponent;
+use central::DefaultCentralPart;
 
 #[wasm_bindgen(module = "/public/glue.js")]
 extern "C" {
@@ -23,11 +27,10 @@ fn main() {
 pub fn App() -> Html {
     html! {
         <div class={"content"}>
+            <HeaderComponent />
             <SideBarComponent />
-            <div class="mainview">
-                <h2 class={"heading"}>{"Hello, World!"}</h2>
-                <FooterComponent />
-            </div>
+            <DefaultCentralPart />
+            <FooterComponent />
         </div>
     }
 }
