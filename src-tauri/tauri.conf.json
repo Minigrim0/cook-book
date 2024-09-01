@@ -40,9 +40,9 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "cook-book",
-        "width": 800,
-        "height": 600,
+        "title": "Cook Book",
+        "width": 1200,
+        "height": 720,
         "visible": false
       },
       {
