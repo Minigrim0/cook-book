@@ -1,9 +1,9 @@
 use yew::{function_component, html, Html};
 
-use super::recipes_tree::RecipesTreeComponent;
+use super::RecipeTreeComponent;
 
 #[function_component]
-pub fn SideBarComponent() -> Html {
+pub fn SidebarComponent() -> Html {
     html! {
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             <div class={"offcanvas-header"}>
@@ -16,11 +16,12 @@ pub fn SideBarComponent() -> Html {
                         <h2 class="accordion-header" id="AccordionRecipeHeading">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionRecipe" aria-expanded="true" aria-controls="AccordionRecipe">
                                 {"Recipes"}
+                                <span class="badge bg-primary rounded-pill">{"14"}</span>
                             </button>
                         </h2>
                         <div id="AccordionRecipe" class="accordion-collapse collapse show" aria-labelledby="AccordionRecipeHeading" data-bs-parent="#SideBarMenuAccorion">
                             <div class="accordion-body">
-                                <RecipesTreeComponent />
+                                <RecipeTreeComponent />
                             </div>
                         </div>
                     </div>
@@ -56,7 +57,11 @@ pub fn SideBarComponent() -> Html {
                         </h2>
                         <div id="AccordionTools" class="accordion-collapse collapse" aria-labelledby="AccordionToolsHeading" data-bs-parent="#SideBarMenuAccorion">
                             <div class="accordion-body">
-                                <strong>{"WIP"}</strong>
+                                <div class="list-group">
+                                    <a class="list-group-item list-group-item-action" href="/load">{"Load recipes"}</a>
+                                    <a class="list-group-item list-group-item-action" href="#">{"Duplicate finder"}</a>
+                                    <a class="list-group-item list-group-item-action" href="#">{"WIP"}</a>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -1,17 +1,22 @@
-use diesel::r2d2::{ConnectionManager, Pool};
-use diesel::SqliteConnection;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use directories::ProjectDirs;
 
-mod pool;
+use diesel::r2d2::{ConnectionManager, Pool};
 
-pub mod insertables;
-pub mod models;
+use diesel::SqliteConnection;
+
+use std::sync::Arc;
+
+mod pool;
 pub mod schema;
 
-pub use pool::get_connection_pool;
+pub mod insertables;
 
 pub type DatabasePool = Pool<ConnectionManager<SqliteConnection>>;
+
+pub type SharedDatabasePool = Arc<DatabasePool>;
+
+pub use pool::get_connection_pool;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
@@ -24,7 +29,7 @@ pub fn database_url() -> Result<String, String> {
     }
 }
 
-fn run_migrations(connection: &mut diesel::sqlite::SqliteConnection) -> Result<(), String> {
+pub fn run_migrations(connection: &mut diesel::sqlite::SqliteConnection) -> Result<(), String> {
     match connection.run_pending_migrations(MIGRATIONS) {
         Ok(_m) => Ok(()),
         Err(e) => Err(format!("Error running migrations: {:?}", e)),
@@ -33,7 +38,7 @@ fn run_migrations(connection: &mut diesel::sqlite::SqliteConnection) -> Result<(
 
 /// Initializes paths to the database by creating the required folders in the
 /// host filesystem. The path is built using the `directories` crate.
-fn init_database_paths() -> Result<(), String> {
+pub fn init_database_paths() -> Result<(), String> {
     if let Some(proj_dirs) = ProjectDirs::from("xyz", "Minigrim0", "cookbook") {
         let database_path = proj_dirs.data_dir();
 

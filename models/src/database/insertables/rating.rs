@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use crate::database::SharedDatabasePool;
+use crate::insertables::DBWrapped;
 
 #[derive(Insertable, Debug)]
 #[diesel(table_name = crate::database::schema::rating)]

@@ -1,7 +1,7 @@
 use yew::{function_component, html, Html};
 
 #[function_component]
-pub fn RecipesTreeComponent() -> Html {
+pub fn RecipeTreeComponent() -> Html {
     html! {
         <ul class="tree">
             <li id="menu12">

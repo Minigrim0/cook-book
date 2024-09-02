@@ -1,28 +1,32 @@
 use diesel::prelude::*;
 
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use crate::database::SharedDatabasePool;
+use crate::insertables::DBWrapped;
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::database::schema::cuisine)]
+#[diesel(table_name = crate::database::schema::author)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct NewCuisine {
+pub struct NewAuthor {
+    pub type_: String,
     pub name: String,
+    pub url: String,
 }
 
-impl DBWrapped for NewCuisine {
+impl DBWrapped for NewAuthor {
     fn new(data: &serde_json::Value) -> Self {
-        NewCuisine {
+        NewAuthor {
+            type_: data["@type"].as_str().unwrap_or("unknown").to_string(),
             name: data["name"].as_str().unwrap_or("unknown").to_string(),
+            url: data["url"].as_str().unwrap_or("unknown").to_string(),
         }
     }
 
     fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
-        use crate::database::schema::cuisine::dsl::*;
+        use crate::database::schema::author::dsl::*;
         let conn = &mut pool.get().unwrap();
 
-        cuisine
-            .filter(name.eq(self.name.clone()))
+        author
+            .filter(url.eq(self.url.clone()))
             .select(id)
             .first::<i32>(conn)
             .ok()
@@ -31,10 +35,10 @@ impl DBWrapped for NewCuisine {
     fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
         let conn = &mut pool.get().unwrap();
 
-        diesel::insert_into(crate::database::schema::cuisine::table)
+        diesel::insert_into(crate::database::schema::author::table)
             .values(self)
             .execute(conn)
-            .expect("Error saving new cuisine");
+            .expect("Error saving new author");
 
         let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
             "last_insert_rowid()",

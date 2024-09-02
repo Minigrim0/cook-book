@@ -1,11 +1,10 @@
 use log::{error, warn};
 use serde_json::json;
 
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use models::SharedDatabasePool;
 
-use crate::database::insertables::{
-    author::NewAuthor, category::NewCategory, rating::NewRating, step::NewStep,
+use models::insertables::{
+    author::NewAuthor, category::NewCategory, rating::NewRating, step::NewStep, DBWrapped,
 };
 
 use super::natural::parse_natural_ingredient;

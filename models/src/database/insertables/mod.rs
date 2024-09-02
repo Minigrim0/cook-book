@@ -8,7 +8,7 @@ pub mod recipe_ingredient;
 pub mod step;
 pub mod unit;
 
-use crate::SharedDatabasePool;
+use crate::database::SharedDatabasePool;
 
 pub trait DBWrapped {
     fn new(data: &serde_json::Value) -> Self;

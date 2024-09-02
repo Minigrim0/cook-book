@@ -4,18 +4,13 @@ use web_sys::window;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-mod central;
-mod footer;
-mod header;
-mod recipes_tree;
+mod components;
+mod pages;
 mod routes;
-mod sidebar;
 
-use central::DefaultCentralPart;
-use footer::FooterComponent;
-use header::HeaderComponent;
+use components::{FooterComponent, HeaderComponent, SidebarComponent};
+use pages::{DefaultEmptyPage, LoaderPage};
 use routes::Route;
-use sidebar::SideBarComponent;
 
 #[wasm_bindgen(module = "/public/glue.js")]
 extern "C" {
@@ -29,7 +24,8 @@ fn main() {
 
 fn switch(routes: Route) -> Html {
     match routes {
-        Route::Home => html! { <DefaultCentralPart /> },
+        Route::Home => html! { <DefaultEmptyPage /> },
+        Route::Loaders => html! { <LoaderPage /> },
         Route::Timers => html! { <p>{"Timers"}</p> },
         Route::Converters => html! { <p>{"Converters"}</p> },
         _ => html! { <p>{"Not found"}</p> },
@@ -41,7 +37,7 @@ pub fn App() -> Html {
     html! {
         <div class={"content"}>
             <HeaderComponent />
-            <SideBarComponent />
+            <SidebarComponent />
             <BrowserRouter>
                 <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
             </BrowserRouter>

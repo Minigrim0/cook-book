@@ -9,4 +9,6 @@ pub enum Route {
     Timers,
     #[at("/converter")]
     Converters,
+    #[at("/load")]
+    Loaders,
 }

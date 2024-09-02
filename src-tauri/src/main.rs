@@ -1,8 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use database::{get_connection_pool, DatabasePool};
 use log::{error, info, trace};
+use models::get_connection_pool;
 use std::fs;
 use std::{
     io,
@@ -13,11 +13,7 @@ use threadpool::ThreadPool;
 
 use simplelog::{Config, LevelFilter, SimpleLogger};
 
-pub mod database;
 pub mod parser;
-pub mod utils;
-
-type SharedDatabasePool = Arc<DatabasePool>;
 
 #[tauri::command]
 fn load_path(data_path: &str, window: Window) -> String {

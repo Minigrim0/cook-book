@@ -1,9 +1,9 @@
 //! This module contains the functions for parsing JSON files into the database.
 use std::path::PathBuf;
 
-use crate::database::insertables::recipe::NewRecipe;
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use models::insertables::recipe::NewRecipe;
+use models::insertables::DBWrapped;
+use models::SharedDatabasePool;
 
 use crate::parser::parsers::{
     parse_author, parse_category, parse_ingredients, parse_instructions, parse_rating,

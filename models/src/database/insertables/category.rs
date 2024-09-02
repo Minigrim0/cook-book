@@ -1,32 +1,31 @@
 use diesel::prelude::*;
 
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use crate::database::SharedDatabasePool;
+use crate::insertables::DBWrapped;
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::database::schema::unit)]
+#[diesel(table_name = crate::database::schema::category)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct NewUnit {
+pub struct NewCategory {
     pub name: String,
 }
 
-impl DBWrapped for NewUnit {
+impl DBWrapped for NewCategory {
     fn new(data: &serde_json::Value) -> Self {
-        NewUnit {
-            name: if data["name"].as_str().unwrap_or("").to_string() == "" {
-                // If there is no name, unit is piece
-                "piece".to_string()
-            } else {
-                data["unit"].as_str().unwrap_or("unknown").to_string()
-            },
+        NewCategory {
+            name: data["recipeCategory"]
+                .as_str()
+                .unwrap_or("unknown")
+                .to_string(),
         }
     }
 
     fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
-        use crate::database::schema::unit::dsl::*;
+        use crate::database::schema::category::dsl::*;
         let conn = &mut pool.get().unwrap();
 
-        unit.filter(name.eq(self.name.clone()))
+        category
+            .filter(name.eq(self.name.clone()))
             .select(id)
             .first::<i32>(conn)
             .ok()
@@ -35,10 +34,10 @@ impl DBWrapped for NewUnit {
     fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
         let conn = &mut pool.get().unwrap();
 
-        diesel::insert_into(crate::database::schema::unit::table)
+        diesel::insert_into(crate::database::schema::category::table)
             .values(self)
             .execute(conn)
-            .expect("Error saving new unit");
+            .expect("Error saving new category");
 
         let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
             "last_insert_rowid()",

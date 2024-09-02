@@ -2,11 +2,10 @@ use log::error;
 use regex::Regex;
 use serde_json::json;
 
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use models::SharedDatabasePool;
 
-use crate::database::insertables::{
-    ingredient::NewIngredient, recipe_ingredient::NewRecipeIngredient, unit::NewUnit,
+use models::insertables::{
+    ingredient::NewIngredient, recipe_ingredient::NewRecipeIngredient, unit::NewUnit, DBWrapped,
 };
 
 fn normalize_units(line: &str) -> String {

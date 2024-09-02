@@ -1,31 +1,27 @@
 use diesel::prelude::*;
 
-use crate::database::insertables::DBWrapped;
-use crate::SharedDatabasePool;
+use crate::database::SharedDatabasePool;
+use crate::insertables::DBWrapped;
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::database::schema::ingredient)]
+#[diesel(table_name = crate::database::schema::cuisine)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-pub struct NewIngredient {
+pub struct NewCuisine {
     pub name: String,
 }
 
-impl DBWrapped for NewIngredient {
+impl DBWrapped for NewCuisine {
     fn new(data: &serde_json::Value) -> Self {
-        NewIngredient {
-            name: if data["name"].as_str().unwrap_or("").to_string() == "" {
-                data["unit"].as_str().unwrap_or("unknown").to_string()
-            } else {
-                data["name"].as_str().unwrap_or("unknown").to_string()
-            },
+        NewCuisine {
+            name: data["name"].as_str().unwrap_or("unknown").to_string(),
         }
     }
 
     fn exists(&self, pool: &SharedDatabasePool) -> Option<i32> {
-        use crate::database::schema::ingredient::dsl::*;
+        use crate::database::schema::cuisine::dsl::*;
         let conn = &mut pool.get().unwrap();
 
-        ingredient
+        cuisine
             .filter(name.eq(self.name.clone()))
             .select(id)
             .first::<i32>(conn)
@@ -35,10 +31,10 @@ impl DBWrapped for NewIngredient {
     fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
         let conn = &mut pool.get().unwrap();
 
-        diesel::insert_into(crate::database::schema::ingredient::table)
+        diesel::insert_into(crate::database::schema::cuisine::table)
             .values(self)
             .execute(conn)
-            .expect("Error saving new ingredient");
+            .expect("Error saving new cuisine");
 
         let last_id: i32 = diesel::select(diesel::dsl::sql::<diesel::sql_types::Integer>(
             "last_insert_rowid()",

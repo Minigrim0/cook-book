@@ -1,0 +1,16 @@
+[package]
+name = "models"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+directories = "5.0.1"
+serde_json = "1.0"
+regex = "1.10.3"
+diesel = { version = "2.1.0", features = ["sqlite", "r2d2"], optional = true }
+diesel_migrations = { version = "2.1.0", features = [
+    "sqlite",
+], optional = true }
+
+[features]
+database = ["diesel", "diesel_migrations"]

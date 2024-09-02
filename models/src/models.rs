@@ -1,7 +1,11 @@
+#[cfg(feature = "database")]
 use diesel::prelude::*;
 
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::author)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Author {
     pub id: i32,
@@ -10,35 +14,44 @@ pub struct Author {
     pub url: String,
 }
 
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::category)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Category {
     pub id: i32,
     pub name: String,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::cuisine)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Cuisine {
     pub id: i32,
     pub name: String,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::ingredient)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Ingredient {
     pub id: i32,
     pub name: String,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::rating)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Rating {
     pub id: i32,
@@ -46,9 +59,11 @@ pub struct Rating {
     pub amount: i32,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::recipe)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Recipe {
     pub id: i32,
@@ -62,9 +77,11 @@ pub struct Recipe {
     pub image: Option<String>,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::recipe_ingredient)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct RecipeIngredient {
     pub id: i32,
@@ -75,9 +92,11 @@ pub struct RecipeIngredient {
     pub details: Option<String>,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::step)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Step {
     pub id: i32,
@@ -86,9 +105,11 @@ pub struct Step {
     pub description: String,
 }
 
-
+#[cfg(feature = "database")]
 #[derive(Queryable, Selectable)]
+#[cfg(feature = "database")]
 #[diesel(table_name = crate::database::schema::unit)]
+#[cfg(feature = "database")]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Unit {
     pub id: i32,

@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 
-use crate::database::insertables::DBWrapped;
+use crate::database::SharedDatabasePool;
+use crate::insertables::DBWrapped;
 use crate::utils::iso8601_to_seconds;
-use crate::SharedDatabasePool;
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::database::schema::recipe)]

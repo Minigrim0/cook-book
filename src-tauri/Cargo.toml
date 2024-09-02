@@ -15,14 +15,14 @@ tauri-build = { version = "1.2", features = [] }
 [dependencies]
 tauri = { version = "1.2", features = ["dialog-open", "shell-open"] }
 serde = { version = "1.0", features = ["derive"] }
-diesel = { version = "2.1.0", features = ["sqlite", "r2d2"] }
 serde_json = "1.0"
 directories = "5.0.1"
 regex = "1.10.3"
-diesel_migrations = { version = "2.1.0", features = ["sqlite"] }
 threadpool = "1.8.1"
 log = "0.4.22"
 simplelog = "0.12.2"
+models = { path = "../models", features = ["database"] }
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
