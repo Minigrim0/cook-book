@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
-use wasm_bindgen_futures::spawn_local;
-use web_sys::window;
+// use wasm_bindgen_futures::spawn_local;
+// use web_sys::window;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -15,7 +15,7 @@ use routes::Route;
 #[wasm_bindgen(module = "/public/glue.js")]
 extern "C" {
     #[wasm_bindgen(js_name = recipe_load_path, catch)]
-    pub async fn recipe_load_path(path: String) -> Result<JsValue, JsValue>;
+    pub async fn recipe_load_path() -> Result<JsValue, JsValue>;
 }
 
 fn main() {
@@ -28,7 +28,6 @@ fn switch(routes: Route) -> Html {
         Route::Loaders => html! { <LoaderPage /> },
         Route::Timers => html! { <p>{"Timers"}</p> },
         Route::Converters => html! { <p>{"Converters"}</p> },
-        _ => html! { <p>{"Not found"}</p> },
     }
 }
 

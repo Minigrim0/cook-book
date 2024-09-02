@@ -1,6 +1,6 @@
 const invoke = window.__TAURI__.invoke;
 
-export async function recipe_load_path(path) {
+export async function recipe_load_path() {
   const selected = await open({
     directory: true,
     multiple: false,
