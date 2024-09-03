@@ -11,4 +11,5 @@ web-sys = "0.3.70"
 yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
 models = { path = "../models", default-features = false }
-tauri-api = "0.7.6"
+wasm-logger = "0.2.0"
+log = "0.4.22"

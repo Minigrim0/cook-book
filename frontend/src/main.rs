@@ -9,7 +9,7 @@ mod pages;
 mod routes;
 
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
-use pages::{DefaultEmptyPage, LoaderPage};
+use pages::{DefaultPage, LoaderPage};
 use routes::Route;
 
 #[wasm_bindgen(module = "/public/glue.js")]
@@ -18,13 +18,9 @@ extern "C" {
     pub async fn recipe_load_path() -> Result<JsValue, JsValue>;
 }
 
-fn main() {
-    yew::Renderer::<App>::new().render();
-}
-
 fn switch(routes: Route) -> Html {
     match routes {
-        Route::Home => html! { <DefaultEmptyPage /> },
+        Route::Home => html! { <DefaultPage /> },
         Route::Loaders => html! { <LoaderPage /> },
         Route::Timers => html! { <p>{"Timers"}</p> },
         Route::Converters => html! { <p>{"Converters"}</p> },
@@ -38,10 +34,16 @@ pub fn App() -> Html {
             <HeaderComponent />
             <SidebarComponent />
             <BrowserRouter>
-                <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
+                <Switch<Route> render={switch} />
             </BrowserRouter>
 
             <FooterComponent />
         </div>
     }
+}
+
+fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
+
+    yew::Renderer::<App>::new().render();
 }
