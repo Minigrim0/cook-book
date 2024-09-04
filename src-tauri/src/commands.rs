@@ -7,9 +7,11 @@ use super::loader;
 
 #[tauri::command]
 pub fn recipe_meta() -> RecipeMeta {
+    info!("getting recipe meta");
+
     RecipeMeta {
         recipe_amount: 5,
-        cuisine_amout: 5,
+        cuisine_amount: 5,
         ingredients_amount: 5,
     }
 }
