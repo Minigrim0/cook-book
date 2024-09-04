@@ -1,11 +1,17 @@
 use log::info;
 use tauri;
 
+use models::RecipeMeta;
+
 use super::loader;
 
 #[tauri::command]
-pub fn recipe_data() -> String {
-    "Lol".to_string()
+pub fn recipe_meta() -> RecipeMeta {
+    RecipeMeta {
+        recipe_amount: 5,
+        cuisine_amout: 5,
+        ingredients_amount: 5,
+    }
 }
 
 #[tauri::command]

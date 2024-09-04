@@ -1,6 +1,7 @@
-use yew::{function_component, html, Html};
+use yew::{function_component, classes, html, Html};
+use yew_router::prelude::Link;
 
-use super::RecipeTreeComponent;
+use crate::routes::RecipeRoute;
 
 #[function_component]
 pub fn SidebarComponent() -> Html {
@@ -21,31 +22,11 @@ pub fn SidebarComponent() -> Html {
                         </h2>
                         <div id="AccordionRecipe" class="accordion-collapse collapse show" aria-labelledby="AccordionRecipeHeading" data-bs-parent="#SideBarMenuAccorion">
                             <div class="accordion-body">
-                                <RecipeTreeComponent />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="AccordionIngredientsHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionIngredients" aria-expanded="false" aria-controls="AccordionIngredients">
-                                {"Ingredients"}
-                            </button>
-                        </h2>
-                        <div id="AccordionIngredients" class="accordion-collapse collapse" aria-labelledby="AccordionIngredientsHeading" data-bs-parent="#SideBarMenuAccorion">
-                            <div class="accordion-body">
-                                <strong>{"WIP"}</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="AccordionCategoriesHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionCategories" aria-expanded="false" aria-controls="AccordionCategories">
-                                {"Categories"}
-                            </button>
-                        </h2>
-                        <div id="AccordionCategories" class="accordion-collapse collapse" aria-labelledby="AccordionCategoriesHeading" data-bs-parent="#SideBarMenuAccorion">
-                            <div class="accordion-body">
-                                <strong>{"WIP"}</strong>
+                                <div class="list-group list-group-flush">
+                                    <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::RecipeRoot}>{"all recipes"}</Link<RecipeRoute>>
+                                    <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::ByCuisine}>{"by cuisine"}</Link<RecipeRoute>>
+                                    <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::FromIngredients}>{"from ingredients"}</Link<RecipeRoute>>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -57,12 +38,24 @@ pub fn SidebarComponent() -> Html {
                         </h2>
                         <div id="AccordionTools" class="accordion-collapse collapse" aria-labelledby="AccordionToolsHeading" data-bs-parent="#SideBarMenuAccorion">
                             <div class="accordion-body">
-                                <div class="list-group">
+                                <div class="list-group list-group-flush">
                                     <a class="list-group-item list-group-item-action" href="/load">{"Load recipes"}</a>
-                                    <a class="list-group-item list-group-item-action" href="#">{"Duplicate finder"}</a>
                                     <a class="list-group-item list-group-item-action" href="#">{"Create a recipe"}</a>
+                                    <a class="list-group-item list-group-item-action" href="#">{"Duplicate finder"}</a>
                                     <a class="list-group-item list-group-item-action" href="#">{"WIP"}</a>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="AccordionCategoriesHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionCategories" aria-expanded="false" aria-controls="AccordionCategories">
+                                {"Settings"}
+                            </button>
+                        </h2>
+                        <div id="AccordionCategories" class="accordion-collapse collapse" aria-labelledby="AccordionCategoriesHeading" data-bs-parent="#SideBarMenuAccorion">
+                            <div class="accordion-body">
+                                <strong>{"WIP"}</strong>
                             </div>
                         </div>
                     </div>

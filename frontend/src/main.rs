@@ -10,7 +10,7 @@ mod routes;
 
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
 use pages::{DefaultPage, LoaderPage, TimerPage};
-use routes::Route;
+use routes::{Route, ToolsRoute, RecipeRoute};
 
 #[wasm_bindgen(module = "/public/glue.js")]
 extern "C" {
@@ -18,12 +18,36 @@ extern "C" {
     pub async fn recipe_load_path() -> Result<JsValue, JsValue>;
 }
 
-fn switch(routes: Route) -> Html {
-    match routes {
+fn switch_tools(route: ToolsRoute) -> Html {
+    match route {
+        ToolsRoute::Load => html! { <LoaderPage /> },
+        ToolsRoute::CreateRecipe => html! { <p>{"Create recipe"}</p> },
+        ToolsRoute::DuplicateFinder => html! { <p>{"Duplicate finder"}</p> },
+    }
+}
+
+fn switch_recipe(route: RecipeRoute) -> Html {
+    match route {
+        RecipeRoute::RecipeRoot => html! { <DefaultPage /> },
+        RecipeRoute::ByCuisine => html! { <DefaultPage /> },
+        RecipeRoute::FromIngredients => html! { <DefaultPage /> }
+    }
+}
+
+fn switch(route: Route) -> Html {
+    match route {
         Route::Home => html! { <DefaultPage /> },
-        Route::Loaders => html! { <LoaderPage /> },
+        Route::ToolsRoot | Route::Tools => {
+            html! { <Switch<ToolsRoute> render={switch_tools} /> }
+        },
+        Route::RecipeRoot | Route::Recipe => {
+            html! { <Switch<RecipeRoute> render={switch_recipe} /> }
+        },
         Route::Timers => html! { <TimerPage /> },
         Route::Converters => html! { <p>{"Converters"}</p> },
+        Route::NotFound => {
+            html! { <div class="position-absolute top-50 start-50 translate-middle"><h1>{"Not found"}</h1></div> }
+        }
     }
 }
 

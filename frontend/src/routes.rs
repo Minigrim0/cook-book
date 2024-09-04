@@ -8,6 +8,35 @@ pub enum Route {
     Timers,
     #[at("/converter")]
     Converters,
-    #[at("/load")]
-    Loaders,
+    #[at("/tools")]
+    ToolsRoot,
+    #[at("/tools/*")]
+    Tools,
+    #[at("/recipe")]
+    RecipeRoot,
+    #[at("/recipe/*")]
+    Recipe,
+    #[not_found]
+    #[at("/404")]
+    NotFound,
+}
+
+#[derive(Clone, Routable, PartialEq)]
+pub enum ToolsRoute {
+    #[at("/tools/load")]
+    Load,
+    #[at("/tools/create")]
+    CreateRecipe,
+    #[at("/tools/dpfinder")]
+    DuplicateFinder,
+}
+
+#[derive(Clone, Routable, PartialEq)]
+pub enum RecipeRoute {
+    #[at("/recipe/")]
+    RecipeRoot,
+    #[at("/recipe/by-cuisine")]
+    ByCuisine,
+    #[at("/recipe/from-ingredient")]
+    FromIngredients,
 }
