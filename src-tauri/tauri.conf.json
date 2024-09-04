@@ -21,6 +21,10 @@
         "open": true
       }
     },
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
     "bundle": {
       "active": true,
       "targets": "all",
@@ -43,14 +47,7 @@
         "title": "Cook Book",
         "width": 1200,
         "height": 720,
-        "visible": false
-      },
-      {
-        "width": 400,
-        "height": 200,
-        "decorations": false,
-        "url": "splashscreen.html",
-        "label": "splashscreen"
+        "visible": true
       }
     ]
   }

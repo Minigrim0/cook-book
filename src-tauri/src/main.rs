@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use log::info;
-use tauri::Manager;
+use tauri::{Manager, SystemTray, SystemTrayEvent};
 
 use simplelog::{Config, LevelFilter, SimpleLogger};
 
@@ -11,22 +11,26 @@ mod loader;
 mod parser;
 
 fn main() {
+    let tray = SystemTray::new();
+
     let _ = SimpleLogger::init(LevelFilter::Info, Config::default());
-    info!("Starting cook-book application");
+    info!("Starting Cook Book");
 
     tauri::Builder::default()
-        .setup(|app| {
-            let splashscreen_window = app.get_window("splashscreen").unwrap();
-            let main_window = app.get_window("main").unwrap();
-            // we perform the initialization code on a new task so the app doesn't freeze
-            tauri::async_runtime::spawn(async move {
-                // TODO: Implement stuff here
-
-                splashscreen_window.close().unwrap();
-                main_window.show().unwrap();
-            });
-
-            Ok(())
+        .on_window_event(|event| match event.event() {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                event.window().hide().unwrap();
+                api.prevent_close();
+            }
+            _ => {}
+        })
+        .system_tray(tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::LeftClick { .. } => {
+                let window = app.get_window("main").unwrap();
+                window.show().unwrap();
+            }
+            _ => (),
         })
         .invoke_handler(tauri::generate_handler![
             commands::load_path,
