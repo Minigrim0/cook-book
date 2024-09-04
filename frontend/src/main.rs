@@ -1,4 +1,3 @@
-use wasm_bindgen::prelude::*;
 // use wasm_bindgen_futures::spawn_local;
 // use web_sys::window;
 use yew::prelude::*;
@@ -8,15 +7,13 @@ mod components;
 mod pages;
 mod routes;
 
+mod glue;
+use glue::*;
+
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
 use pages::{DefaultPage, LoaderPage, TimerPage};
 use routes::{Route, ToolsRoute, RecipeRoute};
 
-#[wasm_bindgen(module = "/public/glue.js")]
-extern "C" {
-    #[wasm_bindgen(js_name = recipe_load_path, catch)]
-    pub async fn recipe_load_path() -> Result<JsValue, JsValue>;
-}
 
 fn switch_tools(route: ToolsRoute) -> Html {
     match route {

@@ -1,11 +1,68 @@
-use yew::{function_component, classes, html, Html};
+use serde_wasm_bindgen;
+use wasm_bindgen_futures::spawn_local;
+use yew::{html, Component, Context, Html, Properties, classes};
 use yew_router::prelude::Link;
+use log::{error, info};
+use yew::Callback;
 
+use models::RecipeMeta;
 use crate::routes::{RecipeRoute, ToolsRoute};
+use crate::get_recipe_meta;
 
-#[function_component]
-pub fn SidebarComponent() -> Html {
-    html! {
+pub struct SidebarComponent {
+    recipes_metadata: RecipeMeta,
+}
+
+fn load_meta(callback: Callback<Result<RecipeMeta, String>>) {
+    spawn_local(async move {
+        match get_recipe_meta().await {
+            Ok(response) => {
+                let meta: Result<RecipeMeta, String> = serde_wasm_bindgen::from_value(response).map_err(|e| e.to_string());
+                callback.emit(meta);
+            },
+            Err(e) => {
+                callback.emit(Err(serde_wasm_bindgen::from_value(e).unwrap()));
+            }
+        }
+    });
+}
+
+pub enum Msg {
+    LoadRecipeMeta,
+    RecipeMetaLoaded(Result<RecipeMeta, String>)
+}
+
+impl Component for SidebarComponent {
+    type Message = Msg;
+    type Properties = ();
+
+    fn create(ctx: &Context<Self>) -> Self {
+        ctx.link().send_message(Msg::LoadRecipeMeta);
+
+        Self {
+            recipes_metadata: RecipeMeta::default()
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::LoadRecipeMeta => {
+                let meat_ready_cb = ctx.link().callback(Msg::RecipeMetaLoaded);
+                load_meta(meat_ready_cb);
+                false
+            },
+            Msg::RecipeMetaLoaded(result) => {
+                match result {
+                    Ok(recipe_meta) => self.recipes_metadata = recipe_meta,
+                    Err(e) => error!("{}", e.to_string())
+                }
+                true
+            }
+        }
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        html! {
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             <div class={"offcanvas-header"}>
                 <h5 class={"offcanvas-title"} id={"offcanvasLabel"}>{"Cook Book"}</h5>
@@ -62,4 +119,5 @@ pub fn SidebarComponent() -> Html {
             </div>
         </div>
     }
+}
 }
