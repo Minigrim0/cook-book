@@ -1,7 +1,7 @@
 use yew::{function_component, classes, html, Html};
 use yew_router::prelude::Link;
 
-use crate::routes::RecipeRoute;
+use crate::routes::{RecipeRoute, ToolsRoute};
 
 #[function_component]
 pub fn SidebarComponent() -> Html {
@@ -39,10 +39,9 @@ pub fn SidebarComponent() -> Html {
                         <div id="AccordionTools" class="accordion-collapse collapse" aria-labelledby="AccordionToolsHeading" data-bs-parent="#SideBarMenuAccorion">
                             <div class="accordion-body">
                                 <div class="list-group list-group-flush">
-                                    <a class="list-group-item list-group-item-action" href="/load">{"Load recipes"}</a>
-                                    <a class="list-group-item list-group-item-action" href="#">{"Create a recipe"}</a>
-                                    <a class="list-group-item list-group-item-action" href="#">{"Duplicate finder"}</a>
-                                    <a class="list-group-item list-group-item-action" href="#">{"WIP"}</a>
+                                    <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::Load}>{"Load recipes"}</Link<ToolsRoute>>
+                                    <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::CreateRecipe}>{"Create a recipe"}</Link<ToolsRoute>>
+                                    <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>{"Duplicate finder"}</Link<ToolsRoute>>
                                 </div>
                             </div>
                         </div>
