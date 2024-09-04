@@ -60,6 +60,7 @@ pub fn SidebarComponent() -> Html {
                                 <div class="list-group">
                                     <a class="list-group-item list-group-item-action" href="/load">{"Load recipes"}</a>
                                     <a class="list-group-item list-group-item-action" href="#">{"Duplicate finder"}</a>
+                                    <a class="list-group-item list-group-item-action" href="#">{"Create a recipe"}</a>
                                     <a class="list-group-item list-group-item-action" href="#">{"WIP"}</a>
                                 </div>
                             </div>

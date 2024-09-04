@@ -9,7 +9,7 @@ mod pages;
 mod routes;
 
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
-use pages::{DefaultPage, LoaderPage};
+use pages::{DefaultPage, LoaderPage, TimerPage};
 use routes::Route;
 
 #[wasm_bindgen(module = "/public/glue.js")]
@@ -22,7 +22,7 @@ fn switch(routes: Route) -> Html {
     match routes {
         Route::Home => html! { <DefaultPage /> },
         Route::Loaders => html! { <LoaderPage /> },
-        Route::Timers => html! { <p>{"Timers"}</p> },
+        Route::Timers => html! { <TimerPage /> },
         Route::Converters => html! { <p>{"Converters"}</p> },
     }
 }
@@ -31,13 +31,12 @@ fn switch(routes: Route) -> Html {
 pub fn App() -> Html {
     html! {
         <div class={"content"}>
-            <HeaderComponent />
-            <SidebarComponent />
             <BrowserRouter>
+                <HeaderComponent />
+                <SidebarComponent />
                 <Switch<Route> render={switch} />
+                <FooterComponent />
             </BrowserRouter>
-
-            <FooterComponent />
         </div>
     }
 }
