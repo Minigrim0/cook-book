@@ -95,7 +95,7 @@ impl Component for SidebarComponent {
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::FromIngredients}>
                                             <p class="col">
                                                 <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.ingredients_amount}</span>
-                                                {"from ingredients"}
+                                                {"by ingredient"}
                                             </p>
                                         </Link<RecipeRoute>>
                                     </div>
@@ -113,6 +113,7 @@ impl Component for SidebarComponent {
                                     <div class="list-group list-group-flush">
                                         <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::Load}>{"Load recipes"}</Link<ToolsRoute>>
                                         <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::CreateRecipe}>{"Create a recipe"}</Link<ToolsRoute>>
+                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>{"Ingredients to recipe"}</Link<ToolsRoute>>
                                         <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>{"Duplicate finder"}</Link<ToolsRoute>>
                                     </div>
                                 </div>

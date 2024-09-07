@@ -109,3 +109,7 @@ ul.tree {
         left: 0px;
     }
 }
+
+.container {
+    overflow-y: scroll;
+}

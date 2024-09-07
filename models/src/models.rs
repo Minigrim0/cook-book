@@ -2,6 +2,7 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
+// Author
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -25,6 +26,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Category
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -44,6 +46,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Cuisine
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -63,6 +66,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Ingredient
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -82,6 +86,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Rating
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -103,6 +108,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Recipe
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -136,6 +142,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// RecipeIngredient
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -163,6 +170,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Step
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
 
@@ -187,6 +195,7 @@ cfg_if::cfg_if! {
     }
 }
 
+// Unit
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
         #[derive(Queryable, Selectable)]
@@ -205,3 +214,8 @@ cfg_if::cfg_if! {
             }
     }
 }
+
+/// The type of the shared data for the ingredients
+/// This is a tuple of the ingredients (paginated), the total number of ingredients and the number of pages
+/// corresponding to the query
+pub type PaginatedIngredients = (Vec<Ingredient>, usize, usize);

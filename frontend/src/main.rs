@@ -54,7 +54,7 @@ pub fn App() -> Html {
             <BrowserRouter>
                 <HeaderComponent />
                 <SidebarComponent />
-                <div class="container-fluid flex-fluid" style="overflow-y: scroll;height: 100%">
+                <div class="container-fluid flex-fluid" style="min-height: 50vh">
                     <Switch<Route> render={switch} />
                 </div>
                 <FooterComponent />

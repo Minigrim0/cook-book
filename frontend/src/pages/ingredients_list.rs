@@ -1,70 +1,30 @@
-use log::error;
-use serde_wasm_bindgen;
-use std::rc::Rc;
+use log::{error, info};
 use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::spawn_local;
-use web_sys::{EventTarget, HtmlInputElement};
+use std::cmp::{min, max};
+use web_sys::{EventTarget, HtmlInputElement, HtmlButtonElement};
 use yew::{classes, html, Component, Context, Html};
-use yew::{Callback, InputEvent};
-use yew_agent::oneshot::use_oneshot_runner;
-use yew_agent::prelude::*;
+use yew::{MouseEvent, InputEvent};
 
-use crate::get_ingredient_list;
-use models::models::Ingredient;
+use models::models::{PaginatedIngredients, Ingredient};
 
-fn load_ingredients(callback: Callback<Result<Vec<Ingredient>, String>>) {
-    spawn_local(async move {
-        match get_ingredient_list().await {
-            Ok(response) => {
-                let data: Result<Vec<Ingredient>, String> =
-                    serde_wasm_bindgen::from_value(response).map_err(|e| e.to_string());
-                callback.emit(data);
-            }
-            Err(e) => {
-                callback.emit(Err(serde_wasm_bindgen::from_value(e).unwrap()));
-            }
-        }
-    });
-}
+use super::services::filter_ingredients;
 
-#[oneshot]
-async fn FilterTask(info: (Rc<Vec<Ingredient>>, String)) -> Vec<Ingredient> {
-    fn filter(list: Rc<Vec<Ingredient>>, pattern: String) -> Vec<Ingredient> {
-        list.iter()
-            .filter(|e| e.name.contains(pattern.as_str()))
-            .map(|i| i.clone())
-            .collect::<Vec<Ingredient>>()
-    }
-
-    filter(info.0, info.1)
-}
-
-/// Filters the vector of ingredients in a separate thread to avoid blocking the frontend on input change
-fn filter_ingredients(
-    ingredients: Rc<Vec<Ingredient>>,
-    filter_pattern: String,
-    callback: Callback<Vec<Ingredient>>,
-) {
-    let filter_task = use_oneshot_runner::<FilterTask>();
-
-    spawn_local(async move {
-        let filter_agent = filter_task.clone();
-        let filtered = filter_agent.run((ingredients, filter_pattern)).await;
-
-        callback.emit(filtered);
-    });
-}
 
 pub struct IngredientsPage {
-    ingredients: Rc<Vec<Ingredient>>,
-    filtered: Vec<Ingredient>,
+    ingredients: Vec<Ingredient>,
+    pattern: String,
+    total_ingredients: i32,
+    current_page: i32,
+    num_pages: i32,
 }
 
 pub enum Msg {
     LoadIngredients,
-    IngredientsLoaded(Result<Vec<Ingredient>, String>),
+    IngredientsLoaded(Result<PaginatedIngredients, String>),
+    PageUp,
+    PageDown,
+    GoToPage(MouseEvent),
     InputChanged(InputEvent),
-    FilterResult(Vec<Ingredient>),
 }
 
 impl Component for IngredientsPage {
@@ -75,8 +35,11 @@ impl Component for IngredientsPage {
         ctx.link().send_message(Msg::LoadIngredients);
 
         IngredientsPage {
-            ingredients: Rc::new(Vec::new()),
-            filtered: Vec::new(),
+            ingredients: Vec::new(),
+            pattern: String::new(),
+            total_ingredients: 0,
+            current_page: 0,
+            num_pages: 0,
         }
     }
 
@@ -84,48 +47,147 @@ impl Component for IngredientsPage {
         match msg {
             Msg::LoadIngredients => {
                 let callback = ctx.link().callback(Msg::IngredientsLoaded);
-                load_ingredients(callback);
+                filter_ingredients(self.pattern.clone(), self.current_page, callback);
                 false
-            }
+            },
             Msg::IngredientsLoaded(result) => {
                 match result {
-                    Ok(ingredients) => self.ingredients = Rc::new(ingredients),
+                    Ok(ingredients) => {
+                        self.ingredients = ingredients.0;
+                        self.total_ingredients = ingredients.1 as i32;
+                        self.num_pages = ingredients.2 as i32;
+                    },
                     Err(e) => error!("An error occured: {}", e.to_string()),
                 }
                 true
-            }
+            },
             Msg::InputChanged(e) => {
                 let target: Option<EventTarget> = e.target();
                 let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
 
                 if let Some(input) = input {
-                    let callback = ctx.link().callback(Msg::FilterResult);
-                    filter_ingredients(Rc::clone(&self.ingredients), input.value(), callback);
+                    self.pattern = input.value();
+                    ctx.link().send_message(Msg::LoadIngredients);
+                    true
+                } else {
+                    false
                 }
+            },
+            Msg::PageUp => {
+                self.current_page = min(self.current_page + 1, self.num_pages - 1);
+                ctx.link().send_message(Msg::LoadIngredients);
                 true
-            }
-            Msg::FilterResult(data) => {
-                self.filtered = data;
+            },
+            Msg::PageDown => {
+                self.current_page = max(self.current_page - 1, 0);
+                ctx.link().send_message(Msg::LoadIngredients);
                 true
+            },
+            Msg::GoToPage(e) => {
+                let target: Option<EventTarget> = e.target();
+                let button = target.and_then(|t| t.dyn_into::<HtmlButtonElement>().ok());
+
+                if let Some(button) = button {
+                    info!("Go to page: {}", button.value());
+                    let page = button.value().parse::<i32>().unwrap_or(0);
+
+                    self.current_page = page;
+                    ctx.link().send_message(Msg::LoadIngredients);
+                    true
+                } else {
+                    error!("Unable to get button value");
+                    false
+                }
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let input_cb = ctx.link().callback(Msg::InputChanged);
-        let num_filtered_elements = self.filtered.len();
+        let previous_cb = ctx.link().callback(|_| Msg::PageDown);
+        let next_cb = ctx.link().callback(|_| Msg::PageUp);
+        let button_cb = ctx.link().callback(Msg::GoToPage);
 
         html! {
-            <div class="container">
-                <div class={classes!("row", "d-flex", "justify-content-between")}>
-                    <h1 class={classes!("col")}>{"Ingredients list"}</h1>
-                    <small class={classes!("col")}>{num_filtered_elements}{" element(s)"}</small>
-                    <input oninput={input_cb} class={classes!("col")} type="text" placeholder="type to filter" />
+            <div>
+                <div class={classes!("row", "p-2")}>
+                    <p class={classes!("col")}>
+                        <span class={classes!("h2")}>{"Ingredients list"}</span>
+                        <span class={classes!("small")}>{self.total_ingredients}{" element(s)"}</span>
+                    </p>
+                    <div class={classes!("col-3")}>
+                        <div class={classes!("input-group", "input-group-sm", "mb-3")}>
+                            <span class={classes!("input-group-text")} id="filter-input-text">{"Filter"}</span>
+                            <input
+                                oninput={input_cb}
+                                aria-label="Filter ingredients"
+                                aria-describedby="filter-input-text"
+                                class={classes!("form-control")}
+                                type="text"
+                                placeholder="type to filter"
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div class={classes!("row", "row-cols-4", "row-cols-md-8", "g-4")}>
-                    if num_filtered_elements > 0 {
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <button
+                                class={classes!("page-link", if self.current_page > 0 {""} else {"disabled"})}
+                                onclick={previous_cb}
+                            >
+                                {"Previous"}
+                            </button>
+                        </li>
                         {
-                            self.filtered.iter().map(|i| {
+                            (max(0, self.current_page-3)..self.current_page)
+                                .map(|index| {
+                                    html! {
+                                        <li class="page-item">
+                                            <button
+                                                class={classes!("page-link")}
+                                                onclick={button_cb.clone()}
+                                                value={index.to_string()}
+                                            >
+                                                {index + 1}
+                                            </button>
+                                        </li>
+                                    }
+                                })
+                                .collect::<Html>()
+                        }
+                        <li class="page-item"><button class={classes!("page-link", "active")}>{self.current_page + 1}</button></li>
+                        {
+                            ((self.current_page+1)..min(self.num_pages, self.current_page+4))
+                                .map(|index| {
+                                    html! {
+                                        <li class="page-item">
+                                            <button
+                                                class={classes!("page-link")}
+                                                onclick={button_cb.clone()}
+                                                value={index.to_string()}
+                                            >
+                                                {index + 1}
+                                            </button>
+                                        </li>
+                                    }
+                                })
+                                .collect::<Html>()
+                        }
+                        <li class="page-item">
+                            <button
+                                class={classes!("page-link", if self.current_page < self.num_pages - 1 {""} else {"disabled"})}
+                                onclick={next_cb}
+                            >
+                                {"Next"}
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+                <div class={classes!("row", "row-cols-xs-2", "row-cols-sm-3", "row-cols-md-6", "row-cols-lg-12", "g-4")}>
+                    if self.total_ingredients > 0 {
+                        {
+                            self.ingredients.iter().map(|i| {
                                 html! {
                                     <div class={classes!("col")}>
                                         <div class={classes!("card")}>

@@ -8,6 +8,10 @@ export async function get_recipe_meta_information() {
   return await invoke("recipe_meta");
 }
 
-export async function get_ingredients() {
-  return await invoke("get_ingredients");
+export async function get_ingredients(limit, offset) {
+  return await invoke("get_ingredients", { limit: limit, offset: offset });
+}
+
+export async function filter_ingredients(pattern, limit, offset) {
+    return await invoke("filter_ingredients", { pattern: pattern, limit: limit, offset: offset });
 }

@@ -24,6 +24,9 @@ pub fn LoaderPage() -> Html {
     html! {
         <div class={classes!("position-absolute", "top-50", "start-50", "translate-middle", "w-75")}>
             <h3 class={classes!("w-100", "text-center")}>{"Loader"}</h3>
+            <div class={classes!("w-100", "text-center")}>
+                <small class={classes!("text-muted")}>{"Use this tool to load recipes in"}</small>
+            </div>
             <div class={classes!("row", "col-12", "p-2")}>
                 <p class={classes!("col-10")}>{"Load from a folder: "}</p>
                 <button class={classes!("col")} onclick={on_folder_select}>{"select folder"}</button>
