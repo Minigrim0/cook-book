@@ -11,9 +11,8 @@ mod glue;
 use glue::*;
 
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
-use pages::{DefaultPage, LoaderPage, TimerPage};
-use routes::{Route, ToolsRoute, RecipeRoute};
-
+use pages::{DefaultPage, IngredientsPage, LoaderPage, TimerPage};
+use routes::{RecipeRoute, Route, ToolsRoute};
 
 fn switch_tools(route: ToolsRoute) -> Html {
     match route {
@@ -27,7 +26,7 @@ fn switch_recipe(route: RecipeRoute) -> Html {
     match route {
         RecipeRoute::RecipeRoot => html! { <DefaultPage /> },
         RecipeRoute::ByCuisine => html! { <DefaultPage /> },
-        RecipeRoute::FromIngredients => html! { <DefaultPage /> }
+        RecipeRoute::FromIngredients => html! { <IngredientsPage /> },
     }
 }
 
@@ -36,10 +35,10 @@ fn switch(route: Route) -> Html {
         Route::Home => html! { <DefaultPage /> },
         Route::ToolsRoot | Route::Tools => {
             html! { <Switch<ToolsRoute> render={switch_tools} /> }
-        },
+        }
         Route::RecipeRoot | Route::Recipe => {
             html! { <Switch<RecipeRoute> render={switch_recipe} /> }
-        },
+        }
         Route::Timers => html! { <TimerPage /> },
         Route::Converters => html! { <p>{"Converters"}</p> },
         Route::NotFound => {
@@ -55,7 +54,9 @@ pub fn App() -> Html {
             <BrowserRouter>
                 <HeaderComponent />
                 <SidebarComponent />
-                <Switch<Route> render={switch} />
+                <div class="container-fluid flex-fluid" style="overflow-y: scroll;height: 100%">
+                    <Switch<Route> render={switch} />
+                </div>
                 <FooterComponent />
             </BrowserRouter>
         </div>

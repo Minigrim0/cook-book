@@ -15,7 +15,7 @@ pub fn get_ingredients() -> Vec<Ingredient> {
     let db_pool = get_connection_pool().unwrap();
     let conn = &mut db_pool.get().unwrap();
 
-    match ingredient.select(Ingredient::as_select()).load(conn) {
+    match ingredient.select(Ingredient::as_select()).order_by(name).load(conn) {
         Ok(data) => data,
         Err(e) => {
             warn!("unable to load ingredients: {}", e.to_string());

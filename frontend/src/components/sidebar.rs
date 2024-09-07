@@ -81,28 +81,22 @@ impl Component for SidebarComponent {
                                 <div class="accordion-body">
                                     <div class="list-group list-group-flush">
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::RecipeRoot}>
-                                            <span class={classes!("row")}>
-                                                <p class="col-10">{"all recipes"}</p>
-                                                <span class="col">
-                                                    <span class="badge bg-primary rounded-pill">{self.recipes_metadata.recipe_amount}</span>
-                                                </span>
-                                            </span>
+                                            <p class="col">
+                                                <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.recipe_amount}</span>
+                                                {"all recipes"}
+                                            </p>
                                         </Link<RecipeRoute>>
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::ByCuisine}>
-                                            <span class={classes!("row")}>
-                                                <p class="col-10">{"by cuisine"}</p>
-                                                <span class="col">
-                                                    <span class="badge bg-primary rounded-pill">{self.recipes_metadata.cuisine_amount}</span>
-                                                </span>
-                                            </span>
+                                            <p>
+                                                <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.cuisine_amount}</span>
+                                                {"by cuisine"}
+                                            </p>
                                         </Link<RecipeRoute>>
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::FromIngredients}>
-                                            <span class={classes!("row")}>
-                                                <p class="col-10">{"from ingredients"}</p>
-                                                <span class="col">
-                                                    <span class="badge bg-primary rounded-pill">{self.recipes_metadata.ingredients_amount}</span>
-                                                </span>
-                                            </span>
+                                            <p class="col">
+                                                <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.ingredients_amount}</span>
+                                                {"from ingredients"}
+                                            </p>
                                         </Link<RecipeRoute>>
                                     </div>
                                 </div>
