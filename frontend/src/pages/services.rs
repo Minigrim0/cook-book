@@ -1,4 +1,5 @@
 use yew::Callback;
+use log::{error, trace};
 use models::{PaginatedIngredients, PaginatedRecipe, CompleteRecipe};
 use wasm_bindgen_futures::spawn_local;
 
@@ -9,8 +10,8 @@ pub fn filter_ingredients(pattern: String, page: i32, callback: Callback<Result<
     spawn_local(async move {
         match glue::filter_ingredients(pattern, 24, page * 24).await {
             Ok(response) => {
-                let data: Result<PaginatedIngredients, String> =
-                    serde_wasm_bindgen::from_value(response).map_err(|e| e.to_string());
+                let data: Result<PaginatedIngredients, String> = serde_wasm_bindgen::from_value(response)
+                    .map_err(|e| format!("Conversion error: {}", e.to_string()));
                 callback.emit(data);
             }
             Err(e) => {
@@ -26,8 +27,9 @@ pub fn filter_recipes(pattern: String, page: i32, callback: Callback<Result<Pagi
     spawn_local(async move {
         match glue::filter_recipes(pattern, 24, page * 24).await {
             Ok(response) => {
-                let data: Result<PaginatedRecipe, String> =
-                    serde_wasm_bindgen::from_value(response).map_err(|e| e.to_string());
+                trace!("Successfully loaded recipe list, converting");
+                let data: Result<PaginatedRecipe, String> = serde_wasm_bindgen::from_value(response)
+                    .map_err(|e| format!("Conversion error: {}", e.to_string()));
                 callback.emit(data);
             },
             Err(e) => callback.emit(Err(serde_wasm_bindgen::from_value(e).unwrap()))
@@ -36,14 +38,19 @@ pub fn filter_recipes(pattern: String, page: i32, callback: Callback<Result<Pagi
 }
 
 /// Spawns a future on the yew runtime to load a recipe from the backend
-pub fn load_recipe(recipe_id: i32, callback: Callback<Result<Result<CompleteRecipe, String>, String>>) {
+pub fn load_recipe(recipe_id: i32, callback: Callback<Result<CompleteRecipe, String>>) {
     spawn_local(async move {
         match glue::load_recipe(recipe_id).await {
             Ok(response) => {
-                let data: Result<Result<CompleteRecipe, String>, String> = serde_wasm_bindgen::from_value(response).map_err(|e| e.to_string());
+                trace!("Successfully loaded recipe, converting");
+                let data: Result<CompleteRecipe, String> = serde_wasm_bindgen::from_value(response)
+                    .map_err(|e| format!("Conversion error: {}", e.to_string()));
                 callback.emit(data);
             },
-            Err(e) => callback.emit(Err(serde_wasm_bindgen::from_value(e).unwrap()))
+            Err(e) => {
+                error!("Error calling load_recipe: {:?}", e);
+                callback.emit(Err(serde_wasm_bindgen::from_value(e).unwrap()));
+            }
         }
     });
 }

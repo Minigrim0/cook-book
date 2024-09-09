@@ -39,4 +39,6 @@ pub enum RecipeRoute {
     ByCuisine,
     #[at("/recipe/from-ingredient")]
     FromIngredients,
+    #[at("/recipe/:id/details")]
+    RecipeDetails { id: i32 },
 }

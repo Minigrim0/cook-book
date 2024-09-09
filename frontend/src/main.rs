@@ -11,7 +11,7 @@ mod glue;
 use glue::*;
 
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
-use pages::{DefaultPage, IngredientsPage, LoaderPage, TimerPage, RecipesPage};
+use pages::{DefaultPage, IngredientsPage, LoaderPage, RecipeDetailsPage, RecipesPage, TimerPage};
 use routes::{RecipeRoute, Route, ToolsRoute};
 
 fn switch_tools(route: ToolsRoute) -> Html {
@@ -27,6 +27,7 @@ fn switch_recipe(route: RecipeRoute) -> Html {
         RecipeRoute::RecipeRoot => html! { <RecipesPage /> },
         RecipeRoute::ByCuisine => html! { <DefaultPage /> },
         RecipeRoute::FromIngredients => html! { <IngredientsPage /> },
+        RecipeRoute::RecipeDetails { id } => html! { <RecipeDetailsPage recipe_id={id} /> },
     }
 }
 

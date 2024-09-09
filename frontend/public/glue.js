@@ -29,8 +29,9 @@ export async function filter_recipes(pattern, limit, offset) {
   });
 }
 
-export async function load_recipe(recipe_id) {
+export async function load_recipe(id) {
+  console.log("Loading recipe from js glue");
   return await invoke("load_recipe", {
-    recipe_id: recipe_id,
+    recipeId: id,
   });
 }

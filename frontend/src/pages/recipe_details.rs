@@ -1,13 +1,9 @@
-use log::{error, info};
-use wasm_bindgen::JsCast;
-use std::cmp::{min, max};
-use web_sys::{EventTarget, HtmlInputElement, HtmlButtonElement};
-use yew::{classes, html, Component, Context, Html, Properties, MouseEvent, InputEvent};
+use log::error;
+use yew::{classes, html, Component, Context, Html, Properties};
 
 use models::CompleteRecipe;
 
 use super::services::load_recipe;
-
 
 pub struct RecipeDetailsPage {
     recipe: Option<CompleteRecipe>,
@@ -15,7 +11,7 @@ pub struct RecipeDetailsPage {
 
 pub enum Msg {
     LoadRecipe,
-    RecipeLoaded(Result<Result<CompleteRecipe, String>, String>),
+    RecipeLoaded(Result<CompleteRecipe, String>),
 }
 
 #[derive(Properties, PartialEq)]
@@ -30,9 +26,7 @@ impl Component for RecipeDetailsPage {
     fn create(ctx: &Context<Self>) -> Self {
         ctx.link().send_message(Msg::LoadRecipe);
 
-        RecipeDetailsPage {
-            recipe: None,
-        }
+        RecipeDetailsPage { recipe: None }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -41,19 +35,13 @@ impl Component for RecipeDetailsPage {
                 let callback = ctx.link().callback(Msg::RecipeLoaded);
                 load_recipe(ctx.props().recipe_id, callback);
                 false
-            },
+            }
             Msg::RecipeLoaded(result) => {
                 match result {
                     Ok(recipe) => {
-                        self.recipe = match recipe {
-                            Ok(recipe) => Some(recipe),
-                            Err(e) => {
-                                error!("{}", e.to_string());
-                                None
-                            }
-                        };
-                    },
-                    Err(e) => error!("An error occured: {}", e.to_string()),
+                        self.recipe = Some(recipe);
+                    }
+                    Err(e) => error!("Backend: {}", e.to_string()),
                 }
                 true
             }

@@ -1,15 +1,17 @@
 use log::{error, info};
+use std::cmp::{max, min};
 use wasm_bindgen::JsCast;
-use std::cmp::{min, max};
-use web_sys::{EventTarget, HtmlInputElement, HtmlButtonElement};
+use web_sys::{EventTarget, HtmlButtonElement, HtmlInputElement};
 use yew::{classes, html, Component, Context, Html};
-use yew::{MouseEvent, InputEvent};
+use yew::{InputEvent, MouseEvent};
+use yew_router::prelude::Link;
+
+use crate::routes::RecipeRoute;
 
 use models::models::Recipe;
 use models::PaginatedRecipe;
 
 use super::services::filter_recipes;
-
 
 pub struct RecipesPage {
     recipes: Vec<Recipe>,
@@ -50,18 +52,18 @@ impl Component for RecipesPage {
                 let callback = ctx.link().callback(Msg::RecipesLoaded);
                 filter_recipes(self.pattern.clone(), self.current_page, callback);
                 false
-            },
+            }
             Msg::RecipesLoaded(result) => {
                 match result {
                     Ok(ingredients) => {
                         self.recipes = ingredients.0;
                         self.total_recipes = ingredients.1 as i32;
                         self.num_pages = ingredients.2 as i32;
-                    },
+                    }
                     Err(e) => error!("An error occured: {}", e.to_string()),
                 }
                 true
-            },
+            }
             Msg::InputChanged(e) => {
                 let target: Option<EventTarget> = e.target();
                 let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
@@ -73,17 +75,17 @@ impl Component for RecipesPage {
                 } else {
                     false
                 }
-            },
+            }
             Msg::PageUp => {
                 self.current_page = min(self.current_page + 1, self.num_pages - 1);
                 ctx.link().send_message(Msg::LoadRecipes);
                 true
-            },
+            }
             Msg::PageDown => {
                 self.current_page = max(self.current_page - 1, 0);
                 ctx.link().send_message(Msg::LoadRecipes);
                 true
-            },
+            }
             Msg::GoToPage(e) => {
                 let target: Option<EventTarget> = e.target();
                 let button = target.and_then(|t| t.dyn_into::<HtmlButtonElement>().ok());
@@ -188,14 +190,16 @@ impl Component for RecipesPage {
                 <div class={classes!("row", "row-cols-xs-2", "row-cols-sm-3", "row-cols-md-6", "row-cols-lg-12", "g-4")}>
                     if self.total_recipes > 0 {
                         {
-                            self.recipes.iter().map(|i| {
+                            self.recipes.iter().map(|r| {
                                 html! {
                                     <div class={classes!("col")}>
                                         <div class={classes!("card")}>
                                             <img src="..." class={classes!("card-img-top")} alt="an delicious image here" />
                                             <div class={classes!("card-body")}>
-                                                <h5 class={classes!("card-title")}>{&i.name}</h5>
-                                                <p class={classes!("card-text")}>{&i.name}{"'s description"}</p>
+                                                <Link<RecipeRoute> classes={classes!("h5", "card-title", "link")} to={RecipeRoute::RecipeDetails { id: r.id }}>
+                                                    {&r.name}
+                                                </Link<RecipeRoute>>
+                                                <p class={classes!("card-text")}>{&r.name}{"'s description"}</p>
                                             </div>
                                         </div>
                                     </div>

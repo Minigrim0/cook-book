@@ -111,23 +111,35 @@ pub fn load_recipe(recipe_id: i32) -> Result<CompleteRecipe, String> {
         }
     };
 
-
-    match recipe
+    let base_recipe = match recipe
         .select(Recipe::as_select())
         .find(recipe_id)
         .first(conn)
         .optional() {
             Ok(Some(r)) => {
                 info!("Loaded recipe {}", r.name);
-                Err("Not implemented".to_string())
+                r
             },
             Ok(None) => {
                 warn!("Unable to find recipe {}", recipe_id);
-                Err("not found".to_string())
+                return Err("not found".to_string());
             },
             Err(e) => {
                 error!("Unable to load recipe {}: {}", recipe_id, e.to_string());
-                Err(e.to_string())
+                return Err(e.to_string());
             }
-        }
+        };
+
+    Ok(CompleteRecipe {
+        id: base_recipe.id,
+        name: base_recipe.name,
+        cook_time: base_recipe.cook_time,
+        prep_time: base_recipe.prep_time,
+        yield_: base_recipe.yield_,
+        author: None,
+        rating: None,
+        category: None,
+        image: None,
+        ingredients: Vec::new(),
+    })
 }
