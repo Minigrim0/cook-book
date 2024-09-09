@@ -2181,6 +2181,7 @@ dependencies = [
  "diesel",
  "diesel_migrations",
  "directories",
+ "log",
  "regex",
  "serde",
  "serde_json",

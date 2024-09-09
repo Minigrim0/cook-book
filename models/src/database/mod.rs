@@ -11,6 +11,7 @@ mod pool;
 pub mod schema;
 
 pub mod insertables;
+pub mod loadables;
 
 pub type DatabasePool = Pool<ConnectionManager<SqliteConnection>>;
 
