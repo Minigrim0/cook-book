@@ -35,8 +35,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::load_path,
             commands::recipe_meta,
-            commands::get_ingredients,
-            commands::filter_ingredients
+            commands::filter_recipes,
+            commands::load_recipe,
+            commands::filter_ingredients,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

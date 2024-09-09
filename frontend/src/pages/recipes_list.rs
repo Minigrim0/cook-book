@@ -5,40 +5,40 @@ use web_sys::{EventTarget, HtmlInputElement, HtmlButtonElement};
 use yew::{classes, html, Component, Context, Html};
 use yew::{MouseEvent, InputEvent};
 
-use models::models::Ingredient;
-use models::PaginatedIngredients;
+use models::models::Recipe;
+use models::PaginatedRecipe;
 
-use super::services::filter_ingredients;
+use super::services::filter_recipes;
 
 
-pub struct IngredientsPage {
-    ingredients: Vec<Ingredient>,
+pub struct RecipesPage {
+    recipes: Vec<Recipe>,
     pattern: String,
-    total_ingredients: i32,
+    total_recipes: i32,
     current_page: i32,
     num_pages: i32,
 }
 
 pub enum Msg {
-    LoadIngredients,
-    IngredientsLoaded(Result<PaginatedIngredients, String>),
+    LoadRecipes,
+    RecipesLoaded(Result<PaginatedRecipe, String>),
     PageUp,
     PageDown,
     GoToPage(MouseEvent),
     InputChanged(InputEvent),
 }
 
-impl Component for IngredientsPage {
+impl Component for RecipesPage {
     type Message = Msg;
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        ctx.link().send_message(Msg::LoadIngredients);
+        ctx.link().send_message(Msg::LoadRecipes);
 
-        IngredientsPage {
-            ingredients: Vec::new(),
+        RecipesPage {
+            recipes: Vec::new(),
             pattern: String::new(),
-            total_ingredients: 0,
+            total_recipes: 0,
             current_page: 0,
             num_pages: 0,
         }
@@ -46,16 +46,16 @@ impl Component for IngredientsPage {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::LoadIngredients => {
-                let callback = ctx.link().callback(Msg::IngredientsLoaded);
-                filter_ingredients(self.pattern.clone(), self.current_page, callback);
+            Msg::LoadRecipes => {
+                let callback = ctx.link().callback(Msg::RecipesLoaded);
+                filter_recipes(self.pattern.clone(), self.current_page, callback);
                 false
             },
-            Msg::IngredientsLoaded(result) => {
+            Msg::RecipesLoaded(result) => {
                 match result {
                     Ok(ingredients) => {
-                        self.ingredients = ingredients.0;
-                        self.total_ingredients = ingredients.1 as i32;
+                        self.recipes = ingredients.0;
+                        self.total_recipes = ingredients.1 as i32;
                         self.num_pages = ingredients.2 as i32;
                     },
                     Err(e) => error!("An error occured: {}", e.to_string()),
@@ -68,7 +68,7 @@ impl Component for IngredientsPage {
 
                 if let Some(input) = input {
                     self.pattern = input.value();
-                    ctx.link().send_message(Msg::LoadIngredients);
+                    ctx.link().send_message(Msg::LoadRecipes);
                     true
                 } else {
                     false
@@ -76,12 +76,12 @@ impl Component for IngredientsPage {
             },
             Msg::PageUp => {
                 self.current_page = min(self.current_page + 1, self.num_pages - 1);
-                ctx.link().send_message(Msg::LoadIngredients);
+                ctx.link().send_message(Msg::LoadRecipes);
                 true
             },
             Msg::PageDown => {
                 self.current_page = max(self.current_page - 1, 0);
-                ctx.link().send_message(Msg::LoadIngredients);
+                ctx.link().send_message(Msg::LoadRecipes);
                 true
             },
             Msg::GoToPage(e) => {
@@ -93,7 +93,7 @@ impl Component for IngredientsPage {
                     let page = button.value().parse::<i32>().unwrap_or(0);
 
                     self.current_page = page;
-                    ctx.link().send_message(Msg::LoadIngredients);
+                    ctx.link().send_message(Msg::LoadRecipes);
                     true
                 } else {
                     error!("Unable to get button value");
@@ -113,8 +113,8 @@ impl Component for IngredientsPage {
             <div>
                 <div class={classes!("row", "p-2")}>
                     <p class={classes!("col")}>
-                        <span class={classes!("h2")}>{"Ingredients list"}</span>
-                        <span class={classes!("small")}>{self.total_ingredients}{" element(s)"}</span>
+                        <span class={classes!("h2")}>{"Recipes list"}</span>
+                        <span class={classes!("small")}>{self.total_recipes}{" element(s)"}</span>
                     </p>
                     <div class={classes!("col-3")}>
                         <div class={classes!("input-group", "input-group-sm", "mb-3")}>
@@ -186,9 +186,9 @@ impl Component for IngredientsPage {
                     </ul>
                 </nav>
                 <div class={classes!("row", "row-cols-xs-2", "row-cols-sm-3", "row-cols-md-6", "row-cols-lg-12", "g-4")}>
-                    if self.total_ingredients > 0 {
+                    if self.total_recipes > 0 {
                         {
-                            self.ingredients.iter().map(|i| {
+                            self.recipes.iter().map(|i| {
                                 html! {
                                     <div class={classes!("col")}>
                                         <div class={classes!("card")}>

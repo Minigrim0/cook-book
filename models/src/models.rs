@@ -214,8 +214,3 @@ cfg_if::cfg_if! {
             }
     }
 }
-
-/// The type of the shared data for the ingredients
-/// This is a tuple of the ingredients (paginated), the total number of ingredients and the number of pages
-/// corresponding to the query
-pub type PaginatedIngredients = (Vec<Ingredient>, usize, usize);
