@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::models::Step;
+
 use super::models::{Author, Category, Cuisine, Ingredient, Rating, Recipe, Unit};
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -36,6 +38,7 @@ pub struct CompleteRecipe {
     pub category: Option<Category>,
     pub image: Option<String>,
     pub ingredients: Vec<Result<CompleteIngredient, String>>,
+    pub steps: Vec<Step>,
 }
 
 /// The type of the shared data for the ingredients

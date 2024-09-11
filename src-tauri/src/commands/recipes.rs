@@ -1,9 +1,6 @@
-use diesel::prelude::*;
-use log::{error, info, warn};
+use log::{info, warn};
 use tauri;
 
-use models::get_connection_pool;
-use models::models::{Cuisine, Ingredient, Recipe};
 use models::{CompleteRecipe, PaginatedRecipe, RecipeMeta};
 
 #[tauri::command]
@@ -71,6 +68,13 @@ pub fn load_recipe(recipe_id: i32) -> Result<CompleteRecipe, String> {
             Vec::new()
         }
     };
+    let steps = match models::database::loadables::get_recipe_steps(base_recipe.id) {
+        Ok(steps) => steps,
+        Err(e) => {
+            warn!("Unable to load recipe steps: {}", e.to_string());
+            Vec::new()
+        }
+    };
 
     Ok(CompleteRecipe {
         id: base_recipe.id,
@@ -83,5 +87,6 @@ pub fn load_recipe(recipe_id: i32) -> Result<CompleteRecipe, String> {
         category: recipe_category,
         image: None,
         ingredients,
+        steps,
     })
 }

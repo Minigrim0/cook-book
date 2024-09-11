@@ -49,11 +49,44 @@ impl Component for RecipeDetailsPage {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
+        let recipe_times: (String, String) = if let Some(recipe) = &self.recipe {
+            (
+                if recipe.cook_time == -1 {
+                    "-".to_string()
+                } else {
+                    recipe.cook_time.to_string()
+                },
+                if recipe.cook_time == -1 {
+                    "-".to_string()
+                } else {
+                    recipe.cook_time.to_string()
+                },
+            )
+        } else {
+            ("-".to_string(), "-".to_string())
+        };
+
         html! {
             <div>
                 <div class={classes!("row", "p-2")}>
                     if let Some(recipe) = &self.recipe {
                         <h1>{&recipe.name}</h1>
+                        <small>{"cook: "}{&recipe_times.0}{" | preparation: "}{&recipe_times.1}</small>
+                        {
+                            recipe.ingredients.iter().map(|i| {
+                                if let Ok(ingredient) = i {
+                                    html! {
+                                        <div>
+                                            <p>{&ingredient.amount}{" "}{&ingredient.unit.name}{" "}{&ingredient.ingredient.name}</p>
+                                        </div>
+                                    }
+                                } else {
+                                    html! {
+                                        <p>{"error"}</p>
+                                    }
+                                }
+                            }).collect::<Html>()
+                        }
                     } else {
                         <div class={classes!("position-absolute", "top-50", "start-50", "translate-middle", "text-muted", "text-center")}>
                             {"Unable to load :/"}
