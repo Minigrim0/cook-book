@@ -2,10 +2,9 @@ use diesel::prelude::*;
 use log::{error, info, warn};
 use tauri;
 
-use models::{RecipeMeta, PaginatedRecipe, CompleteRecipe};
 use models::get_connection_pool;
-use models::models::{Recipe, Ingredient, Cuisine};
-
+use models::models::{Cuisine, Ingredient, Recipe};
+use models::{CompleteRecipe, PaginatedRecipe, RecipeMeta};
 
 #[tauri::command]
 /// Loads various metadata about the recipes like the amount of recipes in the
@@ -43,9 +42,35 @@ pub fn filter_recipes(pattern: String, limit: i32, offset: i32) -> Result<Pagina
 pub fn load_recipe(recipe_id: i32) -> Result<CompleteRecipe, String> {
     info!("Loading recipe {}", recipe_id);
 
-    use models::schema::recipe::dsl::*;
-
     let base_recipe = models::database::loadables::get_recipe(recipe_id)?;
+    let recipe_autor = match models::database::loadables::get_author(base_recipe.author_id) {
+        Ok(author) => Some(author),
+        Err(e) => {
+            warn!("Unable to load recipe author: {}", e);
+            None
+        }
+    };
+    let recipe_rating = match models::database::loadables::get_rating(base_recipe.rating_id) {
+        Ok(rating) => Some(rating),
+        Err(e) => {
+            warn!("Unable to load recipe rating: {}", e);
+            None
+        }
+    };
+    let recipe_category = match models::database::loadables::get_category(base_recipe.category_id) {
+        Ok(category) => Some(category),
+        Err(e) => {
+            warn!("Unable to load recipe category: {}", e.to_string());
+            None
+        }
+    };
+    let ingredients = match models::database::loadables::load_complete_ingredients(base_recipe.id) {
+        Ok(ingredients) => ingredients,
+        Err(e) => {
+            warn!("Unable to load recipe ingredients: {}", e.to_string());
+            Vec::new()
+        }
+    };
 
     Ok(CompleteRecipe {
         id: base_recipe.id,
@@ -53,10 +78,10 @@ pub fn load_recipe(recipe_id: i32) -> Result<CompleteRecipe, String> {
         cook_time: base_recipe.cook_time,
         prep_time: base_recipe.prep_time,
         yield_: base_recipe.yield_,
-        author: None,
-        rating: None,
-        category: None,
+        author: recipe_autor,
+        rating: recipe_rating,
+        category: recipe_category,
         image: None,
-        ingredients: Vec::new(),
+        ingredients,
     })
 }

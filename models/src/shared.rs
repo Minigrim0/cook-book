@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::models::{Ingredient, Recipe, Cuisine, Unit, Author, Rating, Category};
+use super::models::{Author, Category, Cuisine, Ingredient, Rating, Recipe, Unit};
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 /// Include metadata on recipes, amount of recipe, amout of cuisines, ...
@@ -35,7 +35,7 @@ pub struct CompleteRecipe {
     pub rating: Option<Rating>,
     pub category: Option<Category>,
     pub image: Option<String>,
-    pub ingredients: Vec<CompleteIngredient>,
+    pub ingredients: Vec<Result<CompleteIngredient, String>>,
 }
 
 /// The type of the shared data for the ingredients

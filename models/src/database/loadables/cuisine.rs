@@ -1,13 +1,12 @@
+use crate::models::Cuisine;
 use diesel::prelude::*;
 use log::{info, warn};
-use crate::models::Cuisine;
 
 /// Returns the list of all cuisines
 pub fn load_cuisines() -> Vec<Cuisine> {
     warn!("Load cuisine not implemented");
     Vec::new()
 }
-
 
 pub fn count_cuisines() -> Result<usize, String> {
     info!("Counting cuisines");
