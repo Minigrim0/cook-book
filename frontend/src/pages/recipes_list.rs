@@ -6,10 +6,11 @@ use yew::{classes, html, Component, Context, Html};
 use yew::{InputEvent, MouseEvent};
 use yew_router::prelude::Link;
 
-use crate::routes::RecipeRoute;
-
 use models::models::Recipe;
 use models::PaginatedRecipe;
+
+use crate::components::PaginatedNavbar;
+use crate::routes::RecipeRoute;
 
 use super::services::filter_recipes;
 
@@ -70,6 +71,7 @@ impl Component for RecipesPage {
 
                 if let Some(input) = input {
                     self.pattern = input.value();
+                    self.current_page = 0;
                     ctx.link().send_message(Msg::LoadRecipes);
                     true
                 } else {
@@ -132,61 +134,13 @@ impl Component for RecipesPage {
                         </div>
                     </div>
                 </div>
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item">
-                            <button
-                                class={classes!("page-link", if self.current_page > 0 {""} else {"disabled"})}
-                                onclick={previous_cb}
-                            >
-                                {"Previous"}
-                            </button>
-                        </li>
-                        {
-                            (max(0, self.current_page-3)..self.current_page)
-                                .map(|index| {
-                                    html! {
-                                        <li class="page-item">
-                                            <button
-                                                class={classes!("page-link")}
-                                                onclick={button_cb.clone()}
-                                                value={index.to_string()}
-                                            >
-                                                {index + 1}
-                                            </button>
-                                        </li>
-                                    }
-                                })
-                                .collect::<Html>()
-                        }
-                        <li class="page-item"><button class={classes!("page-link", "active")}>{self.current_page + 1}</button></li>
-                        {
-                            ((self.current_page+1)..min(self.num_pages, self.current_page+4))
-                                .map(|index| {
-                                    html! {
-                                        <li class="page-item">
-                                            <button
-                                                class={classes!("page-link")}
-                                                onclick={button_cb.clone()}
-                                                value={index.to_string()}
-                                            >
-                                                {index + 1}
-                                            </button>
-                                        </li>
-                                    }
-                                })
-                                .collect::<Html>()
-                        }
-                        <li class="page-item">
-                            <button
-                                class={classes!("page-link", if self.current_page < self.num_pages - 1 {""} else {"disabled"})}
-                                onclick={next_cb}
-                            >
-                                {"Next"}
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
+                <PaginatedNavbar
+                    previous_callback={previous_cb.clone()}
+                    next_callback={next_cb.clone()}
+                    number_callback={button_cb.clone()}
+                    current_page={self.current_page}
+                    num_pages={self.num_pages}
+                />
                 <div class={classes!("row", "row-cols-xs-2", "row-cols-sm-3", "row-cols-md-6", "row-cols-lg-12", "g-4")}>
                     if self.total_recipes > 0 {
                         {
@@ -213,6 +167,13 @@ impl Component for RecipesPage {
                         </div>
                     }
                 </div>
+                <PaginatedNavbar
+                    previous_callback={previous_cb.clone()}
+                    next_callback={next_cb.clone()}
+                    number_callback={button_cb.clone()}
+                    current_page={self.current_page}
+                    num_pages={self.num_pages}
+                />
             </div>
         }
     }

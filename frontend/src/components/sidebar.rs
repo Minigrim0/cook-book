@@ -125,9 +125,14 @@ impl Component for SidebarComponent {
                                     {"Settings"}
                                 </button>
                             </h2>
-                            <div id="AccordionCategories" class="accordion-collapse collapse" aria-labelledby="AccordionCategoriesHeading" data-bs-parent="#SideBarMenuAccorion">
+                            <div id="AccordionCategories" class={classes!("accordion-collapse", "collapse")} aria-labelledby="AccordionCategoriesHeading" data-bs-parent="#SideBarMenuAccorion">
                                 <div class="accordion-body">
-                                    <strong>{"WIP"}</strong>
+                                    <div class={classes!("list-group", "list-group-flush")}>
+                                        <a class={classes!("list-group-item", "list-group-item-action")}>{"application settings"}</a>
+                                        <a class={classes!("list-group-item", "list-group-item-action")}>{"backup database"}</a>
+                                        <a class={classes!("list-group-item", "list-group-item-action", "text-danger")}>{"quit"}</a>
+                                        <a class={classes!("list-group-item", "list-group-item-action", "text-danger")}>{"reset database"}</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
