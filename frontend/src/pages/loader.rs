@@ -2,6 +2,7 @@ use crate::recipe_load_path;
 use log::{info, warn};
 use yew::{classes, function_component, html, Callback, Html};
 
+
 #[function_component]
 pub fn LoaderPage() -> Html {
     let on_folder_select = Callback::from(move |_| {

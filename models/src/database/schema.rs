@@ -32,6 +32,26 @@ diesel::table! {
 }
 
 diesel::table! {
+    job (id) {
+        id -> Nullable<Integer>,
+        status -> Text,
+        progress -> Float,
+        details -> Nullable<Text>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    job_log (id) {
+        id -> Nullable<Integer>,
+        job_id -> Integer,
+        log_entry -> Text,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     rating (id) {
         id -> Integer,
         score -> Float,
@@ -90,6 +110,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(job_log -> job (job_id));
 diesel::joinable!(recipe -> author (author_id));
 diesel::joinable!(recipe -> category (category_id));
 diesel::joinable!(recipe -> rating (rating_id));
@@ -105,6 +126,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     category,
     cuisine,
     ingredient,
+    job,
+    job_log,
     rating,
     recipe,
     recipe_cuisine,

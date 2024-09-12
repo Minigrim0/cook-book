@@ -1,5 +1,6 @@
 #[cfg(feature = "database")]
 use diesel::prelude::*;
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 // Author
@@ -212,5 +213,57 @@ cfg_if::cfg_if! {
                 pub id: i32,
                 pub name: String,
             }
+    }
+}
+
+// Job
+cfg_if::cfg_if! {
+    if #[cfg(feature = "database")] {
+        #[derive(Queryable, Selectable)]
+        #[diesel(table_name = crate::database::schema::job)]
+        #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+        #[derive(Serialize, Deserialize, Debug, Clone)]
+        pub struct Job {
+            pub id: Option<i32>,
+            pub status: String,
+            pub progress: f32,
+            pub details: Option<String>,
+            pub created_at: NaiveDateTime,
+            pub updated_at: NaiveDateTime,
+        }
+    } else {
+        #[derive(Serialize, Deserialize, Debug, Clone)]
+        pub struct Job {
+            pub id: Option<i32>,
+            pub status: String,
+            pub progress: f32,
+            pub details: Option<String>,
+            pub created_at: NaiveDateTime,
+            pub updated_at: NaiveDateTime,
+        }
+    }
+}
+
+// JobLog
+cfg_if::cfg_if! {
+    if #[cfg(feature = "database")] {
+        #[derive(Queryable, Selectable)]
+        #[diesel(table_name = crate::database::schema::job_log)]
+        #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+        #[derive(Serialize, Deserialize, Debug, Clone)]
+        pub struct JobLog {
+            pub id: Option<i32>,
+            pub job_id: i32,
+            pub log_entry: String,
+            pub created_at: NaiveDateTime,
+        }
+    } else {
+        #[derive(Serialize, Deserialize, Debug, Clone)]
+        pub struct JobLog {
+            pub id: Option<i32>,
+            pub job_id: i32,
+            pub log_entry: String,
+            pub created_at: NaiveDateTime,
+        }
     }
 }

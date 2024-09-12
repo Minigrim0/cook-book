@@ -7,6 +7,8 @@ pub mod recipe;
 pub mod recipe_ingredient;
 pub mod step;
 pub mod unit;
+pub mod job;
+pub mod job_log;
 
 use crate::database::SharedDatabasePool;
 

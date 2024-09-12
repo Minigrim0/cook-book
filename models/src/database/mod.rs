@@ -10,6 +10,7 @@ use std::sync::Arc;
 mod pool;
 pub mod schema;
 
+pub mod job;
 pub mod insertables;
 pub mod loadables;
 

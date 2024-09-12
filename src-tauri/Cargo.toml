@@ -27,7 +27,7 @@ log = "0.4.22"
 simplelog = "0.12.2"
 models = { path = "../models", features = ["database"] }
 diesel = { version = "2.1.0", features = ["sqlite", "r2d2"] }
-
+lazy_static = "1.4"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

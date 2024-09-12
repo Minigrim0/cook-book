@@ -1,6 +1,7 @@
 use log::error;
 use regex::Regex;
 use serde_json::json;
+use lazy_static::lazy_static;
 
 use models::SharedDatabasePool;
 
@@ -15,6 +16,73 @@ fn normalize_units(line: &str) -> String {
     // TODO: remove plurals
 
     new_line
+}
+
+lazy_static! {
+    static ref INGREDIENT_REGEX: Regex = Regex::new(
+        r"^((?:\d+(?:\.\d+)?|\d+\/\d+)\s*(?:-\s*(?:\d+(?:\.\d+)?|\d+\/\d+)\s*)?)?(\w+(?:\s+\w+)?)?\s*(.+?)(?:,\s*(.+))?$"
+    ).unwrap();
+}
+
+#[derive(Debug)]
+struct ParsedIngredient {
+    original: String,
+    amount: Option<f32>,
+    unit: Option<String>,
+    name: Option<String>,
+    details: Option<String>,
+}
+
+fn parse_ingredient(ingredient: &str) -> ParsedIngredient {
+    let ingredient = ingredient.trim();
+    
+    if let Some(captures) = INGREDIENT_REGEX.captures(ingredient) {
+        ParsedIngredient {
+            original: ingredient.to_string(),
+            amount: captures.get(1).and_then(|m| parse_amount(m.as_str())),
+            unit: captures.get(2).map(|m| m.as_str().to_lowercase()),
+            name: captures.get(3).map(|m| m.as_str().trim().to_string()),
+            details: captures.get(4).map(|m| m.as_str().trim().to_string()),
+        }
+    } else {
+        ParsedIngredient {
+            original: ingredient.to_string(),
+            amount: None,
+            unit: None,
+            name: Some(ingredient.to_string()),
+            details: None,
+        }
+    }
+}
+
+fn parse_amount(amount: &str) -> Option<f32> {
+    if amount.contains('-') {
+        let parts: Vec<&str> = amount.split('-').collect();
+        if parts.len() == 2 {
+            let min = parse_fraction(parts[0]);
+            let max = parse_fraction(parts[1]);
+            Some((min + max) / 2.0)
+        } else {
+            None
+        }
+    } else {
+        Some(parse_fraction(amount))
+    }
+}
+
+fn parse_fraction(fraction: &str) -> f32 {
+    if fraction.contains('/') {
+        let parts: Vec<&str> = fraction.split('/').collect();
+        if parts.len() == 2 {
+            let numerator: f32 = parts[0].trim().parse().unwrap_or(0.0);
+            let denominator: f32 = parts[1].trim().parse().unwrap_or(1.0);
+            numerator / denominator
+        } else {
+            0.0
+        }
+    } else {
+        fraction.trim().parse().unwrap_or(0.0)
+    }
 }
 
 pub fn get_or_create_ingredient(
@@ -76,37 +144,18 @@ pub fn parse_natural_ingredient(
     r_id: i32,
     pool: &SharedDatabasePool,
 ) -> Option<NewRecipeIngredient> {
-    let basic_re = Regex::new(r"^(?P<amount>\d+\.?\d*) (?:\((?P<alt>.*)\))?\s*(?P<unit>\w+)(?:\s*(?P<name>[.[^,\n]]*))?(?:,(?P<details>.*))?$").unwrap();
-    let new_line = normalize_units(line);
-    let basic_match = basic_re.captures(new_line.as_str());
-    if basic_match.is_none() {
-        // TODO: create 'error' models with all data to ask user later
-
-        return None;
-    }
-
-    let basic_match = basic_match.unwrap();
-    let amount: Option<&str> = basic_match
-        .name("amount")
-        .map_or(None, |s| Some(s.as_str()));
-    let _alt = basic_match.name("alt").map_or(None, |s| Some(s.as_str()));
-    let unit = basic_match.name("unit").map_or(None, |s| Some(s.as_str()));
-    let name = basic_match.name("name").map_or(None, |s| Some(s.as_str()));
-    let details = basic_match
-        .name("details")
-        .map_or(None, |s| Some(s.as_str()));
-
-    let ingredient_id = get_or_create_ingredient(name, unit, pool).unwrap_or(-1);
-    let unit_id = get_or_create_unit(name, unit, pool).unwrap_or(-1);
+    let parsed = parse_ingredient(line);
+    
+    let ingredient_id = get_or_create_ingredient(parsed.name.as_deref(), parsed.unit.as_deref(), pool).unwrap_or(-1);
+    let unit_id = get_or_create_unit(parsed.name.as_deref(), parsed.unit.as_deref(), pool).unwrap_or(-1);
 
     let recipe_ingredient = NewRecipeIngredient::new(&json!({
         "r_id": r_id,
         "i_id": ingredient_id,
         "u_id": unit_id,
-        "amount": amount,
-        // alt: alt.map_or(None, |s| Some(s.to_string())),
-        "details": details,
-        "full": line.to_string(),
+        "amount": parsed.amount,
+        "details": parsed.details,
+        "full": parsed.original,
     }));
 
     Some(recipe_ingredient)
