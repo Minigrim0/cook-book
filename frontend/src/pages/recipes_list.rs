@@ -118,7 +118,7 @@ impl Component for RecipesPage {
                 <div class={classes!("row", "p-2")}>
                     <p class={classes!("col")}>
                         <span class={classes!("h2")}>{"Recipes list"}</span>
-                        <span class={classes!("small")}>{self.total_recipes}{" element(s)"}</span>
+                        <span class={classes!("small", "ms-2")}>{self.total_recipes}{" element(s)"}</span>
                     </p>
                     <div class={classes!("col-3")}>
                         <div class={classes!("input-group", "input-group-sm", "mb-3")}>
@@ -134,13 +134,15 @@ impl Component for RecipesPage {
                         </div>
                     </div>
                 </div>
-                <PaginatedNavbar
-                    previous_callback={previous_cb.clone()}
-                    next_callback={next_cb.clone()}
-                    number_callback={button_cb.clone()}
-                    current_page={self.current_page}
-                    num_pages={self.num_pages}
-                />
+                if self.total_recipes > 0 {
+                    <PaginatedNavbar
+                        previous_callback={previous_cb.clone()}
+                        next_callback={next_cb.clone()}
+                        number_callback={button_cb.clone()}
+                        current_page={self.current_page}
+                        num_pages={self.num_pages}
+                    />
+                }
                 <div class={classes!("row", "row-cols-xs-2", "row-cols-sm-3", "row-cols-md-6", "row-cols-lg-12", "g-4")}>
                     if self.total_recipes > 0 {
                         {
@@ -167,13 +169,15 @@ impl Component for RecipesPage {
                         </div>
                     }
                 </div>
-                <PaginatedNavbar
-                    previous_callback={previous_cb.clone()}
-                    next_callback={next_cb.clone()}
-                    number_callback={button_cb.clone()}
-                    current_page={self.current_page}
-                    num_pages={self.num_pages}
-                />
+                if self.total_recipes > 0 {
+                    <PaginatedNavbar
+                        previous_callback={previous_cb.clone()}
+                        next_callback={next_cb.clone()}
+                        number_callback={button_cb.clone()}
+                        current_page={self.current_page}
+                        num_pages={self.num_pages}
+                    />
+                }
             </div>
         }
     }
