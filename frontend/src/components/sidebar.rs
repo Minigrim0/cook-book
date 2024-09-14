@@ -5,7 +5,7 @@ use yew::Callback;
 use yew::{classes, html, Component, Context, Html};
 use yew_router::prelude::Link;
 
-use crate::get_recipe_meta;
+use crate::{get_recipe_meta, reset_database};
 use crate::routes::{RecipeRoute, ToolsRoute};
 use models::RecipeMeta;
 
@@ -31,6 +31,7 @@ fn load_meta(callback: Callback<Result<RecipeMeta, String>>) {
 pub enum Msg {
     LoadRecipeMeta,
     RecipeMetaLoaded(Result<RecipeMeta, String>),
+    ResetDatabase,
 }
 
 impl Component for SidebarComponent {
@@ -59,10 +60,20 @@ impl Component for SidebarComponent {
                 }
                 true
             }
+            Msg::ResetDatabase => {
+                spawn_local(async move {
+                    if let Err(e) = reset_database().await {
+                        error!("Error {:?}", e);
+                    }
+                });
+                true
+            }
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let reset_database_cb = ctx.link().callback(|_| Msg::ResetDatabase);
+
         html! {
             <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
                 <div class={"offcanvas-header"}>
@@ -128,10 +139,10 @@ impl Component for SidebarComponent {
                             <div id="AccordionCategories" class={classes!("accordion-collapse", "collapse")} aria-labelledby="AccordionCategoriesHeading" data-bs-parent="#SideBarMenuAccorion">
                                 <div class="accordion-body">
                                     <div class={classes!("list-group", "list-group-flush")}>
-                                        <a class={classes!("list-group-item", "list-group-item-action")}>{"application settings"}</a>
-                                        <a class={classes!("list-group-item", "list-group-item-action")}>{"backup database"}</a>
-                                        <a class={classes!("list-group-item", "list-group-item-action", "text-danger")}>{"quit"}</a>
-                                        <a class={classes!("list-group-item", "list-group-item-action", "text-danger")}>{"reset database"}</a>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action")}>{"application settings"}</button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action")}>{"backup database"}</button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action", "link-danger")}>{"quit"}</button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action", "link-danger")} onclick={reset_database_cb}>{"reset database"}</button>
                                     </div>
                                 </div>
                             </div>
