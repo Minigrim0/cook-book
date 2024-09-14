@@ -1,7 +1,7 @@
 -- Your SQL goes here
 -- Create the main job table
 CREATE TABLE job (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     status TEXT NOT NULL,
     progress REAL NOT NULL DEFAULT 0,
     details TEXT,
@@ -11,7 +11,7 @@ CREATE TABLE job (
 
 -- Create a separate table for logs
 CREATE TABLE job_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     job_id INTEGER NOT NULL,
     log_entry TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

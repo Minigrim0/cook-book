@@ -33,7 +33,7 @@ diesel::table! {
 
 diesel::table! {
     job (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         status -> Text,
         progress -> Float,
         details -> Nullable<Text>,
@@ -44,7 +44,7 @@ diesel::table! {
 
 diesel::table! {
     job_log (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         job_id -> Integer,
         log_entry -> Text,
         created_at -> Timestamp,
