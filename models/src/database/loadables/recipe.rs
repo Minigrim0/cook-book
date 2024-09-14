@@ -1,12 +1,13 @@
 use log::warn;
 use diesel::prelude::*;
-use crate::models::Recipe;
 
-pub fn get_recipe(recipe_id: i32) -> Result<Recipe, String> {
+use crate::models::Recipe;
+use crate::database::SharedDatabasePool;
+
+pub fn get_recipe(recipe_id: i32, pool: &SharedDatabasePool) -> Result<Recipe, String> {
     use crate::schema::recipe::dsl::*;
 
-    let conn = &mut super::get_connection()?;
-
+    let conn = &mut pool.get().map_err(|e| e.to_string())?;
     match recipe
         .select(Recipe::as_select())
         .find(recipe_id)
@@ -18,10 +19,10 @@ pub fn get_recipe(recipe_id: i32) -> Result<Recipe, String> {
         }
 }
 
-pub fn count_recipes() -> Result<usize, String> {
+pub fn count_recipes(pool: &SharedDatabasePool) -> Result<usize, String> {
     use crate::schema::recipe::dsl::*;
 
-    let conn = &mut super::get_connection()?;
+    let conn = &mut pool.get().map_err(|e| e.to_string())?;
 
     match recipe
         .select(Recipe::as_select())
@@ -34,10 +35,10 @@ pub fn count_recipes() -> Result<usize, String> {
         }
 }
 
-pub fn filter_recipes(pattern: String) -> Result<Vec<Recipe>, String> {
+pub fn filter_recipes(pattern: String, pool: &SharedDatabasePool) -> Result<Vec<Recipe>, String> {
     use crate::schema::recipe::dsl::*;
 
-    let conn = &mut super::get_connection()?;
+    let conn = &mut pool.get().map_err(|e| e.to_string())?;
 
     match recipe
         .select(Recipe::as_select())

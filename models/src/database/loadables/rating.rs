@@ -1,14 +1,14 @@
 use diesel::prelude::*;
 use log::info;
 
-use super::get_connection;
+use crate::database::SharedDatabasePool;
 use crate::models::Rating;
 
-pub fn get_rating(rating_id: i32) -> Result<Rating, String> {
+pub fn get_rating(rating_id: i32, pool: &SharedDatabasePool) -> Result<Rating, String> {
     info!("Loading rating {}", rating_id);
     use crate::schema::rating::dsl::*;
 
-    let conn = &mut get_connection()?;
+    let conn = &mut pool.get().map_err(|e| e.to_string())?;
 
     match rating
         .select(Rating::as_select())
