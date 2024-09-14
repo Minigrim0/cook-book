@@ -6,7 +6,7 @@ use lazy_static::lazy_static;
 use models::SharedDatabasePool;
 
 use models::insertables::{
-    ingredient::NewIngredient, recipe_ingredient::NewRecipeIngredient, unit::NewUnit, DBWrapped,
+    NewIngredient, NewRecipeIngredient, NewUnit, DBWrapped,
 };
 
 fn normalize_units(line: &str) -> String {
