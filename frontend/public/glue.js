@@ -35,3 +35,13 @@ export async function load_recipe(id) {
     recipeId: id,
   });
 }
+
+export async function reset_database() {
+  return await invoke("reset_database");
+}
+
+export async function get_job_status(job_id) {
+  return await invoke("get_job_status", {
+    jobId: job_id,
+  });
+}
