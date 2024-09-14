@@ -14,4 +14,4 @@ yew-router = "0.18.0"
 models = { path = "../models", default-features = false }
 wasm-logger = "0.2.0"
 log = "0.4.22"
-yew-agent = "0.3.0"
+gloo-timers = "0.3.0"
