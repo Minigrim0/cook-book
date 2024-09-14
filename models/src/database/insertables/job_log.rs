@@ -8,7 +8,7 @@ use crate::insertables::DBWrapped;
 #[derive(Insertable, Debug)]
 #[diesel(table_name = crate::database::schema::job_log)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-struct NewJobLog {
+pub struct NewJobLog {
     pub job_id: i32,
     pub log_entry: String,
     pub created_at: chrono::NaiveDateTime,
@@ -50,15 +50,14 @@ impl DBWrapped for NewJobLog {
             .filter(log_entry.eq(&self.log_entry))
             .filter(created_at.eq(self.created_at))
             .select(id)
-            .first::<Option<i32>>(conn)
-            .unwrap_or(None);
+            .first::<i32>(conn);
 
         match &result {
-            Some(i) => log::info!("Existing JobLog found with id: {}", i),
-            None => log::info!("No existing JobLog found"),
+            Ok(i) => log::info!("Existing JobLog found with id: {}", i),
+            Err(e) => log::info!("No existing JobLog found: {}", e),
         }
 
-        result
+        result.ok()
     }
 
     fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {

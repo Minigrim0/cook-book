@@ -1,14 +1,26 @@
-pub mod author;
-pub mod category;
-pub mod cuisine;
-pub mod ingredient;
-pub mod rating;
-pub mod recipe;
-pub mod recipe_ingredient;
-pub mod step;
-pub mod unit;
-pub mod job;
-pub mod job_log;
+mod author;
+mod category;
+mod cuisine;
+mod ingredient;
+mod rating;
+mod recipe;
+mod recipe_ingredient;
+mod step;
+mod unit;
+mod job;
+mod job_log;
+
+pub use author::*;
+pub use category::*;
+pub use cuisine::*;
+pub use ingredient::*;
+pub use rating::*;
+pub use recipe::*;
+pub use recipe_ingredient::*;
+pub use step::*;
+pub use unit::*;
+pub use job::*;
+pub use job_log::*;
 
 use crate::database::SharedDatabasePool;
 

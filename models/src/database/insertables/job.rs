@@ -3,11 +3,10 @@ use diesel::prelude::*;
 use crate::database::SharedDatabasePool;
 use crate::insertables::DBWrapped;
 
-
 #[derive(Insertable, Debug)]
 #[diesel(table_name = crate::database::schema::job)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-struct NewJob {
+pub struct NewJob {
     pub status: String,
     pub progress: f32,
     pub details: Option<String>,
@@ -43,15 +42,14 @@ impl DBWrapped for NewJob {
             .filter(created_at.eq(self.created_at))
             .filter(updated_at.eq(self.updated_at))
             .select(id)
-            .first::<Option<i32>>(conn)
-            .unwrap_or(None);
+            .first::<i32>(conn);
 
         match &result {
-            Some(i) => log::info!("Existing Job found with id: {}", i),
-            None => log::info!("No existing Job found"),
+            Ok(i) => log::info!("Existing Job found with id: {}", i),
+            Err(e) => log::info!("No existing Job found: {}", e),
         }
 
-        result
+        result.ok()
     }
 
     fn save(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
