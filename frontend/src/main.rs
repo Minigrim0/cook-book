@@ -1,66 +1,103 @@
-// use wasm_bindgen_futures::spawn_local;
-// use web_sys::window;
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod components;
 mod pages;
 mod routes;
+mod timer;
+mod switch;
 
 mod glue;
 use glue::*;
 
+use switch::switch;
+use timer::Timer;
 use components::{FooterComponent, HeaderComponent, SidebarComponent};
-use pages::{DefaultPage, IngredientsPage, LoaderPage, RecipeDetailsPage, RecipesPage, TimerPage};
-use routes::{RecipeRoute, Route, ToolsRoute};
+use routes::{Route, ToolsRoute};
 
-fn switch_tools(route: ToolsRoute) -> Html {
-    match route {
-        ToolsRoute::Load => html! { <LoaderPage /> },
-        ToolsRoute::CreateRecipe => html! { <p>{"Create recipe"}</p> },
-        ToolsRoute::DuplicateFinder => html! { <p>{"Duplicate finder"}</p> },
-    }
+#[derive(Properties, PartialEq, Clone)]
+pub struct AppProps {
+    pub timer_add_callback: Callback<Timer>,
+    pub timer_remove_callback: Callback<i32>,
+    pub timer_update_callback: Callback<(i32, bool)>,
+    pub timers: Rc<RefCell<Vec<Timer>>>,
 }
 
-fn switch_recipe(route: RecipeRoute) -> Html {
-    match route {
-        RecipeRoute::RecipeRoot => html! { <RecipesPage /> },
-        RecipeRoute::ByCuisine => html! { <DefaultPage /> },
-        RecipeRoute::FromIngredients => html! { <IngredientsPage /> },
-        RecipeRoute::RecipeDetails { id } => html! { <RecipeDetailsPage recipe_id={id} /> },
-    }
+
+pub struct App {
+    timers: Rc<RefCell<Vec<Timer>>>,
 }
 
-fn switch(route: Route) -> Html {
-    match route {
-        Route::Home => html! { <RecipesPage /> },
-        Route::ToolsRoot | Route::Tools => {
-            html! { <Switch<ToolsRoute> render={switch_tools} /> }
-        }
-        Route::RecipeRoot | Route::Recipe => {
-            html! { <Switch<RecipeRoute> render={switch_recipe} /> }
-        }
-        Route::Timers => html! { <TimerPage /> },
-        Route::Converters => html! { <p>{"Converters"}</p> },
-        Route::NotFound => {
-            html! { <div class="position-absolute top-50 start-50 translate-middle"><h1>{"Not found"}</h1></div> }
-        }
-    }
+pub enum AppMsg {
+    AddTimer(Timer),
+    RemoveTimer(i32),
+    UpdateTimer((i32, bool)),
 }
 
-#[function_component]
-pub fn App() -> Html {
-    html! {
-        <div class={"content"}>
-            <BrowserRouter>
-                <HeaderComponent />
-                <SidebarComponent />
-                <div class="container-fluid flex-fluid" style="min-height: 50vh">
-                    <Switch<Route> render={switch} />
-                </div>
-                <FooterComponent />
-            </BrowserRouter>
-        </div>
+impl Component for App {
+    type Message = AppMsg;
+    type Properties = ();
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            timers: Rc::new(RefCell::new(Vec::new())),
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            AppMsg::AddTimer(timer) => {
+                self.timers.borrow_mut().push(timer);
+                true
+            }
+            AppMsg::RemoveTimer(id) => {
+                let mut timers = self.timers.borrow_mut();
+                if let Some(index) = timers.iter().position(|t| t.id == id) {
+                    timers.remove(index);
+                    true
+                } else {
+                    false
+                }
+            }
+            AppMsg::UpdateTimer((id, is_running)) => {
+                let mut timers = self.timers.borrow_mut();
+                if let Some(timer) = timers.iter_mut().find(|t| t.id == id) {
+                    timer.is_running = is_running;
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let on_timer_added = ctx.link().callback(AppMsg::AddTimer);
+        let on_timer_removed = ctx.link().callback(AppMsg::RemoveTimer);
+        let on_timer_updated = ctx.link().callback(AppMsg::UpdateTimer);
+
+        let props = AppProps {
+            timers: Rc::clone(&self.timers),
+            timer_add_callback: on_timer_added,
+            timer_remove_callback: on_timer_removed,
+            timer_update_callback: on_timer_updated,
+        };
+
+        html! {
+            <div class={"content"}>
+                <BrowserRouter>
+                    <HeaderComponent />
+                    <SidebarComponent />
+                    <div class="container-fluid flex-fluid" style="min-height: 50vh">
+                        <Switch<Route> render={move |route| switch(route, props.clone())} />
+                    </div>
+                    <FooterComponent />
+                </BrowserRouter>
+            </div>
+        }
     }
 }
 
