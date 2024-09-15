@@ -85,7 +85,7 @@ impl Component for SidebarComponent {
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="AccordionRecipeHeading">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionRecipe" aria-expanded="true" aria-controls="AccordionRecipe">
-                                    {"Recipes"}
+                                    <i class="bi bi-book me-2"></i>{"Recipes"}
                                 </button>
                             </h2>
                             <div id="AccordionRecipe" class="accordion-collapse collapse show" aria-labelledby="AccordionRecipeHeading" data-bs-parent="#SideBarMenuAccorion">
@@ -93,18 +93,21 @@ impl Component for SidebarComponent {
                                     <div class="list-group list-group-flush">
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::RecipeRoot}>
                                             <p class="col">
+                                                <i class="bi bi-list-ul me-2"></i>
                                                 <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.recipe_amount}</span>
                                                 {"all recipes"}
                                             </p>
                                         </Link<RecipeRoute>>
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::ByCuisine}>
                                             <p>
+                                                <i class="bi bi-globe me-2"></i>
                                                 <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.cuisine_amount}</span>
                                                 {"by cuisine"}
                                             </p>
                                         </Link<RecipeRoute>>
                                         <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::FromIngredients}>
                                             <p class="col">
+                                                <i class="bi bi-egg-fried me-2"></i>
                                                 <span class="me-2 badge bg-primary rounded-pill">{self.recipes_metadata.ingredients_amount}</span>
                                                 {"by ingredient"}
                                             </p>
@@ -116,16 +119,24 @@ impl Component for SidebarComponent {
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="AccordionToolsHeading">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionTools" aria-expanded="false" aria-controls="AccordionTools">
-                                    {"Tools"}
+                                    <i class="bi bi-tools me-2"></i>{"Tools"}
                                 </button>
                             </h2>
                             <div id="AccordionTools" class="accordion-collapse collapse" aria-labelledby="AccordionToolsHeading" data-bs-parent="#SideBarMenuAccorion">
                                 <div class="accordion-body">
                                     <div class="list-group list-group-flush">
-                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::Load}>{"Load recipes"}</Link<ToolsRoute>>
-                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::CreateRecipe}>{"Create a recipe"}</Link<ToolsRoute>>
-                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>{"Ingredients to recipe"}</Link<ToolsRoute>>
-                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>{"Duplicate finder"}</Link<ToolsRoute>>
+                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::Load}>
+                                            <i class="bi bi-cloud-upload me-2"></i>{"Load recipes"}
+                                        </Link<ToolsRoute>>
+                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::CreateRecipe}>
+                                            <i class="bi bi-plus-circle me-2"></i>{"Create a recipe"}
+                                        </Link<ToolsRoute>>
+                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>
+                                            <i class="bi bi-search me-2"></i>{"Ingredients to recipe"}
+                                        </Link<ToolsRoute>>
+                                        <Link<ToolsRoute> classes={classes!("list-group-item", "list-group-item-action")} to={ToolsRoute::DuplicateFinder}>
+                                            <i class="bi bi-files me-2"></i>{"Duplicate finder"}
+                                        </Link<ToolsRoute>>
                                     </div>
                                 </div>
                             </div>
@@ -133,16 +144,24 @@ impl Component for SidebarComponent {
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="AccordionCategoriesHeading">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#AccordionCategories" aria-expanded="false" aria-controls="AccordionCategories">
-                                    {"Settings"}
+                                    <i class="bi bi-gear me-2"></i>{"Settings"}
                                 </button>
                             </h2>
                             <div id="AccordionCategories" class={classes!("accordion-collapse", "collapse")} aria-labelledby="AccordionCategoriesHeading" data-bs-parent="#SideBarMenuAccorion">
                                 <div class="accordion-body">
                                     <div class={classes!("list-group", "list-group-flush")}>
-                                        <button class={classes!("link", "list-group-item", "list-group-item-action")}>{"application settings"}</button>
-                                        <button class={classes!("link", "list-group-item", "list-group-item-action")}>{"backup database"}</button>
-                                        <button class={classes!("link", "list-group-item", "list-group-item-action", "link-danger")}>{"quit"}</button>
-                                        <button class={classes!("link", "list-group-item", "list-group-item-action", "link-danger")} onclick={reset_database_cb}>{"reset database"}</button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action")}>
+                                            <i class="bi bi-sliders me-2"></i>{"application settings"}
+                                        </button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action")}>
+                                            <i class="bi bi-cloud-arrow-up me-2"></i>{"backup database"}
+                                        </button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action", "link-danger")}>
+                                            <i class="bi bi-power me-2"></i>{"quit"}
+                                        </button>
+                                        <button class={classes!("link", "list-group-item", "list-group-item-action", "link-danger")} onclick={reset_database_cb}>
+                                            <i class="bi bi-arrow-counterclockwise me-2"></i>{"reset database"}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

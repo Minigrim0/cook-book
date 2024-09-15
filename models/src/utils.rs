@@ -1,5 +1,6 @@
 use regex::Regex;
 
+#[cfg(feature = "database")]
 pub fn iso8601_to_seconds(iso_string: String) -> i32 {
     let re = Regex::new(r"(?:P?)(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?(?:T?)(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+)S)?").unwrap();
     if let Some(matches) = re.captures(&iso_string) {

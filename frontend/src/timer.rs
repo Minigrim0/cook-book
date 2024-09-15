@@ -11,7 +11,7 @@ pub struct Timer {
     pub name: String,
     pub duration: u32,
     pub is_running: bool,
-    pub start_time: u32,
+    pub elapsed_time: u32,
 }
 
 impl PartialEq for Timer {

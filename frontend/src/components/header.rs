@@ -5,6 +5,7 @@ use yew_router::prelude::{use_location, Link};
 use yew_router::Routable;
 
 use crate::Route;
+use crate::components::ActiveTimersDropdown;
 
 /// Returns the "active" class string if the provided route matches the location
 fn active(route: Route, location: &Option<Location>) -> String {
@@ -52,12 +53,9 @@ pub fn HeaderComponent() -> Html {
                             <Link<Route> classes={classes!("nav-link", active(Route::Converters, &location))} to={Route::Converters}>{"Converter"}</Link<Route>>
                         </li>
                     </ul>
-
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                        <button class="btn btn-outline-success" type="submit">{"Search"}</button>
-                    </form>
-
+                    <div class="d-flex">
+                        <ActiveTimersDropdown />
+                    </div>
                 </div>
             </div>
         </nav>

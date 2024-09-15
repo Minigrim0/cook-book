@@ -66,17 +66,40 @@ impl Component for TimerPage {
             } else {
                 "New timer".to_string()
             };
-            let duration = if let Some(duration_element) = form.get_with_name("timer-duration") {
-                duration_element.dyn_into::<web_sys::HtmlInputElement>().unwrap().value().parse::<u32>().unwrap_or(0)
-            } else {
-                0
-            };
+
+            let hours = form
+                .get_with_name("timer-hours")
+                .map_or(0, |e| e
+                    .dyn_into::<web_sys::HtmlInputElement>()
+                    .unwrap()
+                    .value()
+                    .parse::<u32>()
+                    .unwrap_or(0));
+            let minutes = form
+                .get_with_name("timer-minutes")
+                .map_or(0, |e| e
+                    .dyn_into::<web_sys::HtmlInputElement>()
+                    .unwrap()
+                    .value()
+                    .parse::<u32>()
+                    .unwrap_or(0));
+            let seconds = form
+                .get_with_name("timer-seconds")
+                .map_or(0, |e| e
+                    .dyn_into::<web_sys::HtmlInputElement>()
+                    .unwrap()
+                    .value()
+                    .parse::<u32>()
+                    .unwrap_or(0));
+
+            let duration = (hours * 3600) + (minutes * 60) + seconds;
+
             TimerPageMessage::AddTimer(Timer {
                 id: next_id,
-                name: name,
-                duration: duration,
-                is_running: false,
-                start_time: chrono::Utc::now().timestamp() as u32,
+                name,
+                duration,
+                is_running: true,  // Start the timer immediately
+                elapsed_time: 0,
             })
         });
 
@@ -104,9 +127,12 @@ impl Component for TimerPage {
                         <div class={classes!("mb-3", "form-group")}>
                             <input type="text" name="timer-name" class={classes!("form-control")} placeholder="Timer name" />
                         </div>
-                        <div class={classes!("mb-3", "form-group")}>
-                            <input type="number" name="timer-duration" class={classes!("form-control")} placeholder="Timer duration" />
+                        <div class={classes!("mb-3", "form-group", "d-flex")}>
+                            <input type="number" name="timer-hours" class={classes!("form-control", "me-2")} placeholder="Hours" min="0" />
+                            <input type="number" name="timer-minutes" class={classes!("form-control", "me-2")} placeholder="Minutes" min="0" max="59" />
+                            <input type="number" name="timer-seconds" class={classes!("form-control")} placeholder="Seconds" min="0" max="59" />
                         </div>
+
                         <button type="submit" class={classes!("btn", "btn-primary")}>{"Add timer"}</button>
                     </form>
                 </div>

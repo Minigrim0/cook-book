@@ -3,6 +3,7 @@ use std::cell::RefCell;
 
 use yew::prelude::*;
 use yew_router::prelude::*;
+use gloo_timers::callback::Interval;
 
 mod components;
 mod pages;
@@ -26,24 +27,29 @@ pub struct AppProps {
     pub timers: Rc<RefCell<Vec<Timer>>>,
 }
 
-
 pub struct App {
     timers: Rc<RefCell<Vec<Timer>>>,
+    _interval: Interval,
 }
 
 pub enum AppMsg {
     AddTimer(Timer),
     RemoveTimer(i32),
     UpdateTimer((i32, bool)),
+    Tick,
 }
 
 impl Component for App {
     type Message = AppMsg;
     type Properties = ();
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
+        let link = ctx.link().clone();
+        let interval = Interval::new(1000, move || link.send_message(AppMsg::Tick));
+        
         Self {
             timers: Rc::new(RefCell::new(Vec::new())),
+            _interval: interval,
         }
     }
 
@@ -70,6 +76,19 @@ impl Component for App {
                 } else {
                     false
                 }
+            }
+            AppMsg::Tick => {
+                let mut timers = self.timers.borrow_mut();
+                for timer in timers.iter_mut() {
+                    if timer.is_running {
+                        if timer.elapsed_time < timer.duration {
+                            timer.elapsed_time += 1;
+                        } else {
+                            timer.is_running = false;
+                        }
+                    }
+                }
+                true
             }
         }
     }
