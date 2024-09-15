@@ -1,30 +1,34 @@
 use web_sys::SubmitEvent;
-use yew::{html, Component, Context, Html};
+use yew::{html, Component, Context, Html, classes};
 use wasm_bindgen::JsCast;
 use log::info;
+use gloo_timers::callback::Interval;
 
 use crate::AppProps;
 use crate::timer::Timer;
+use crate::components::Timer as TimerComponent;
 
-pub struct TimerPage;
+pub struct TimerPage {
+    _interval: Option<Interval>,
+}
 
 pub enum TimerPageMessage {
     AddTimer(Timer),
     RemoveTimer(i32),
     UpdateTimer(i32, bool),
-    GetTimers,
+    Tick,
 }
-
-
 
 impl Component for TimerPage {
     type Message = TimerPageMessage;
     type Properties = AppProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        ctx.link().send_message(TimerPageMessage::GetTimers);
-
-        Self
+        let link = ctx.link().clone();
+        let interval = Interval::new(500, move || link.send_message(TimerPageMessage::Tick));
+        Self {
+            _interval: Some(interval),
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -44,9 +48,8 @@ impl Component for TimerPage {
                 ctx.props().timer_update_callback.emit((id, is_running));
                 true
             }
-            // Load timers from inside the browser's local storage
-            TimerPageMessage::GetTimers => {
-                // let timers = get_timers();
+            TimerPageMessage::Tick => {
+                // Force a re-render every second
                 true
             }
         }
@@ -58,8 +61,16 @@ impl Component for TimerPage {
             // Prevent the default form submission behavior
             form_data.prevent_default();
             let form: web_sys::HtmlFormElement = form_data.target().unwrap().dyn_into().unwrap();
-            let name = form.get_attribute("name").unwrap_or("New timer".to_string());
-            let duration = form.get_attribute("duration").unwrap_or("0".to_string()).parse::<u32>().unwrap_or(0);
+            let name = if let Some(name_element) = form.get_with_name("timer-name") {
+                name_element.dyn_into::<web_sys::HtmlInputElement>().unwrap().value()
+            } else {
+                "New timer".to_string()
+            };
+            let duration = if let Some(duration_element) = form.get_with_name("timer-duration") {
+                duration_element.dyn_into::<web_sys::HtmlInputElement>().unwrap().value().parse::<u32>().unwrap_or(0)
+            } else {
+                0
+            };
             TimerPageMessage::AddTimer(Timer {
                 id: next_id,
                 name: name,
@@ -79,38 +90,9 @@ impl Component for TimerPage {
                             let new_state = !timer.is_running;
                             let on_delete = ctx.link().callback(move |_| TimerPageMessage::RemoveTimer(timer_id));
                             let on_toggle = ctx.link().callback(move |_| TimerPageMessage::UpdateTimer(timer_id, new_state));
-                            let (progress, remaining) = if timer.is_running {
-                                let elapsed = if timer.duration > 0 {
-                                    (chrono::Utc::now().timestamp() as u32 - timer.start_time) % timer.duration
-                                } else {
-                                    0
-                                };
-                                let progress = if timer.duration > 0 {
-                                    (elapsed as f32 / timer.duration as f32) * 100.0
-                                } else {
-                                    0.0
-                                };
-                                let remaining = timer.duration - elapsed;
-                                (progress, remaining)
-                            } else {
-                                (0.0, timer.duration)
-                            };
 
                             html! {
-                                <div class="timer-item">
-                                    <div class="circular-progress" style={format!("--progress: {}deg", progress * 3.6)}>
-                                        <div class="inner-circle">
-                                            <span class="timer-name">{&timer.name}</span>
-                                            <span class="timer-duration">{format!("{}s", remaining)}</span>
-                                        </div>
-                                    </div>
-                                    <div class="timer-controls">
-                                        <button class="toggle-btn" onclick={on_toggle}>
-                                            {if timer.is_running { "Stop" } else { "Resume" }}
-                                        </button>
-                                        <button class="delete-btn" onclick={on_delete}>{"Delete"}</button>
-                                    </div>
-                                </div>
+                                <TimerComponent timer={timer.clone()} on_toggle={on_toggle} on_delete={on_delete} />
                             }
                         }).collect::<Html>()}
                         if ctx.props().timers.borrow().is_empty() {
@@ -119,13 +101,13 @@ impl Component for TimerPage {
                     </div>
 
                     <form onsubmit={on_submit} class="mt-4">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" placeholder="Timer name" />
+                        <div class={classes!("mb-3", "form-group")}>
+                            <input type="text" name="timer-name" class={classes!("form-control")} placeholder="Timer name" />
                         </div>
-                        <div class="mb-3">
-                            <input type="number" class="form-control" placeholder="Timer duration" />
+                        <div class={classes!("mb-3", "form-group")}>
+                            <input type="number" name="timer-duration" class={classes!("form-control")} placeholder="Timer duration" />
                         </div>
-                        <button type="submit" class="btn btn-primary">{"Add timer"}</button>
+                        <button type="submit" class={classes!("btn", "btn-primary")}>{"Add timer"}</button>
                     </form>
                 </div>
             </>
