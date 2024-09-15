@@ -26,4 +26,10 @@ extern "C" {
     pub async fn load_recipe(
         recipe_id: i32,
     ) -> Result<JsValue, JsValue>;
+
+    #[wasm_bindgen(js_name = reset_database, catch)]
+    pub async fn reset_database() -> Result<JsValue, JsValue>;
+
+    #[wasm_bindgen(js_name = get_job_status, catch)]
+    pub async fn get_job_status(job_id: i32) -> Result<JsValue, JsValue>;
 }

@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::Step;
+use super::models::*;
 
-use super::models::{Author, Category, Cuisine, Ingredient, Rating, Recipe, Unit};
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 /// Include metadata on recipes, amount of recipe, amout of cuisines, ...
@@ -40,6 +39,14 @@ pub struct CompleteRecipe {
     pub ingredients: Vec<Result<CompleteIngredient, String>>,
     pub steps: Vec<Step>,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+/// A job with its logs
+pub struct JobWithLogs {
+    pub job: Job,
+    pub logs: Vec<JobLog>,
+}
+
 
 /// The type of the shared data for the ingredients
 /// This is a tuple of the ingredients (paginated), the total number of ingredients and the number of pages

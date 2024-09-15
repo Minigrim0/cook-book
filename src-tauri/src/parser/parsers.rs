@@ -4,7 +4,7 @@ use serde_json::json;
 use models::SharedDatabasePool;
 
 use models::insertables::{
-    author::NewAuthor, category::NewCategory, rating::NewRating, step::NewStep, DBWrapped,
+    NewAuthor, NewCategory, NewRating, NewStep, DBWrapped,
 };
 
 use super::natural::parse_natural_ingredient;

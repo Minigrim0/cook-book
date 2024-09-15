@@ -1,18 +1,20 @@
-use crate::models::Cuisine;
 use diesel::prelude::*;
 use log::{info, warn};
 
+use crate::models::Cuisine;
+use crate::database::SharedDatabasePool;
+
 /// Returns the list of all cuisines
-pub fn load_cuisines() -> Vec<Cuisine> {
+pub fn load_cuisines(pool: &SharedDatabasePool) -> Result<Vec<Cuisine>, String> {
     warn!("Load cuisine not implemented");
-    Vec::new()
+    Ok(Vec::new())
 }
 
-pub fn count_cuisines() -> Result<usize, String> {
+pub fn count_cuisines(pool: &SharedDatabasePool) -> Result<usize, String> {
     info!("Counting cuisines");
     use crate::schema::cuisine::dsl::*;
 
-    let conn = &mut super::get_connection()?;
+    let conn = &mut pool.get().map_err(|e| e.to_string())?;
 
     match cuisine.select(Cuisine::as_select()).load(conn) {
         Ok(data) => Ok(data.len()),

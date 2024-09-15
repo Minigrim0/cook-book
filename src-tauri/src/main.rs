@@ -3,20 +3,30 @@
 
 use log::info;
 use tauri::{Manager, SystemTray, SystemTrayEvent};
-
 use simplelog::{Config, LevelFilter, SimpleLogger};
+use std::error::Error;
+use models::SharedDatabasePool;
+use std::sync::Arc;
 
 mod commands;
 mod loader;
 mod parser;
 
-fn main() {
+#[cfg(test)]
+mod tests;
+
+fn main() -> Result<(), Box<dyn Error>> {
     let tray = SystemTray::new();
 
     let _ = SimpleLogger::init(LevelFilter::Info, Config::default());
     info!("Starting Cook Book");
 
+    // Initialize the SQLite connection pool
+    let db_pool: SharedDatabasePool = Arc::new(models::database::get_connection_pool()
+        .expect("Failed to create pool"));
+
     tauri::Builder::default()
+        .manage(db_pool)
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 event.window().hide().unwrap();
@@ -38,7 +48,11 @@ fn main() {
             commands::filter_recipes,
             commands::load_recipe,
             commands::filter_ingredients,
+            commands::reset_database,
+            commands::get_job_status,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    Ok(())
 }

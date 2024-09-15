@@ -1,12 +1,12 @@
 use diesel::prelude::*;
 use log::info;
 
-use super::get_connection;
+use crate::database::SharedDatabasePool;
 use crate::models::Author;
 
-pub fn get_author(author_id: i32) -> Result<Author, String> {
+pub fn get_author(author_id: i32, pool: &SharedDatabasePool) -> Result<Author, String> {
     info!("Loading author {}", author_id);
-    let conn = &mut get_connection()?;
+    let conn = &mut pool.get().map_err(|e| e.to_string())?;
 
     use crate::schema::author::dsl::*;
     match author
