@@ -25,6 +25,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    image_blobs (id) {
+        id -> Integer,
+        image_data -> Binary,
+        created_at -> Timestamp,
+        hash -> Text,
+    }
+}
+
+diesel::table! {
     ingredient (id) {
         id -> Integer,
         name -> Text,
@@ -70,7 +79,6 @@ diesel::table! {
         author_id -> Integer,
         rating_id -> Integer,
         category_id -> Integer,
-        image -> Nullable<Text>,
     }
 }
 
@@ -79,6 +87,13 @@ diesel::table! {
         id -> Integer,
         recipe_id -> Integer,
         cuisine_id -> Integer,
+    }
+}
+
+diesel::table! {
+    recipe_images (recipe_id, image_id) {
+        recipe_id -> Integer,
+        image_id -> Integer,
     }
 }
 
@@ -116,6 +131,7 @@ diesel::joinable!(recipe -> category (category_id));
 diesel::joinable!(recipe -> rating (rating_id));
 diesel::joinable!(recipe_cuisine -> cuisine (cuisine_id));
 diesel::joinable!(recipe_cuisine -> recipe (recipe_id));
+diesel::joinable!(recipe_images -> image_blobs (image_id));
 diesel::joinable!(recipe_ingredient -> ingredient (ingredient_id));
 diesel::joinable!(recipe_ingredient -> recipe (recipe_id));
 diesel::joinable!(recipe_ingredient -> unit (unit_id));
@@ -125,12 +141,14 @@ diesel::allow_tables_to_appear_in_same_query!(
     author,
     category,
     cuisine,
+    image_blobs,
     ingredient,
     job,
     job_log,
     rating,
     recipe,
     recipe_cuisine,
+    recipe_images,
     recipe_ingredient,
     step,
     unit,

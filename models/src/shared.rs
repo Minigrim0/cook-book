@@ -24,6 +24,15 @@ pub struct CompleteIngredient {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+/// An image in a recipe, contains the data, the hash and the recipe id
+pub struct RecipeImage {
+    pub id: i32,
+    pub data: Vec<u8>,
+    pub hash: String,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// Model shared to the frontend to display a recipe.
 /// Loading this model involves multiple other models.
 pub struct CompleteRecipe {
@@ -38,6 +47,7 @@ pub struct CompleteRecipe {
     pub image: Option<String>,
     pub ingredients: Vec<Result<CompleteIngredient, String>>,
     pub steps: Vec<Step>,
+    pub images: Vec<RecipeImage>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

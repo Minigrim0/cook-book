@@ -4,6 +4,9 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "database")]
+use sha2::{Digest, Sha256};
+
+#[cfg(feature = "database")]
 use crate::database::SharedDatabasePool;
 #[cfg(feature = "database")]
 use crate::database::insertables::NewJobLog;
@@ -129,7 +132,6 @@ cfg_if::cfg_if! {
     }
 }
 
-
 // Ingredient
 cfg_if::cfg_if! {
     if #[cfg(feature = "database")] {
@@ -217,7 +219,6 @@ cfg_if::cfg_if! {
             pub author_id: i32,
             pub rating_id: i32,
             pub category_id: i32,
-            pub image: Option<String>,
         }
 
         impl Updateable for Recipe {
@@ -234,7 +235,6 @@ cfg_if::cfg_if! {
                         crate::database::schema::recipe::author_id.eq(self.author_id),
                         crate::database::schema::recipe::rating_id.eq(self.rating_id),
                         crate::database::schema::recipe::category_id.eq(self.category_id),
-                        crate::database::schema::recipe::image.eq(&self.image),
                     ))
                     .execute(conn)?;
 
@@ -300,6 +300,45 @@ cfg_if::cfg_if! {
             pub unit_id: i32,
             pub amount: f32,
             pub details: Option<String>,
+        }
+    }
+}
+
+// Image
+cfg_if::cfg_if! {
+    if #[cfg(feature = "database")] {
+        #[derive(Queryable, Selectable)]
+        #[diesel(table_name = crate::database::schema::image_blobs)]
+        #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+        #[derive(Serialize, Deserialize, Debug, Clone)]
+        pub struct Image {
+            pub id: i32,
+            pub image_data: Vec<u8>,
+            pub hash: String,
+        }
+
+        impl Updateable for Image {
+            fn update(&self, pool: &SharedDatabasePool) -> Result<i32, diesel::result::Error> {
+                let conn = &mut pool.get().unwrap();
+                let new_hash = hash(&self.image_data);
+
+                diesel::update(crate::database::schema::image_blobs::table)
+                    .filter(crate::database::schema::image_blobs::id.eq(self.id))
+                    .set((
+                        crate::database::schema::image_blobs::image_data.eq(&self.image_data),
+                        crate::database::schema::image_blobs::hash.eq(new_hash),
+                    ))
+                    .execute(conn)?;
+
+                Ok(self.id)
+            }
+        }
+    } else {
+        #[derive(Serialize, Deserialize, Debug, Clone)]
+        pub struct Image {
+            pub id: i32,
+            pub data: Vec<u8>,
+            pub hash: String,
         }
     }
 }
