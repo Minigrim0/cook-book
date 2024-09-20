@@ -23,7 +23,8 @@ use routes::{Route, ToolsRoute};
 pub struct AppProps {
     pub timer_add_callback: Callback<Timer>,
     pub timer_remove_callback: Callback<i32>,
-    pub timer_update_callback: Callback<(i32, bool)>,
+    pub timer_update_callback: Callback<i32>,
+    pub timer_stop_callback: Callback<i32>,
     pub timers: Rc<RefCell<Vec<Timer>>>,
 }
 
@@ -35,8 +36,9 @@ pub struct App {
 pub enum AppMsg {
     AddTimer(Timer),
     RemoveTimer(i32),
-    UpdateTimer((i32, bool)),
+    UpdateTimer(i32),
     Tick,
+    StopTimer(i32),
 }
 
 impl Component for App {
@@ -68,10 +70,10 @@ impl Component for App {
                     false
                 }
             }
-            AppMsg::UpdateTimer((id, is_running)) => {
+            AppMsg::UpdateTimer(id) => {
                 let mut timers = self.timers.borrow_mut();
                 if let Some(timer) = timers.iter_mut().find(|t| t.id == id) {
-                    timer.is_running = is_running;
+                    timer.is_running = !timer.is_running;
                     true
                 } else {
                     false
@@ -90,6 +92,16 @@ impl Component for App {
                 }
                 true
             }
+            AppMsg::StopTimer(id) => {
+                let mut timers = self.timers.borrow_mut();
+                if let Some(timer) = timers.iter_mut().find(|t| t.id == id) {
+                    timer.is_running = false;
+                    timer.elapsed_time = 0;
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -97,18 +109,26 @@ impl Component for App {
         let on_timer_added = ctx.link().callback(AppMsg::AddTimer);
         let on_timer_removed = ctx.link().callback(AppMsg::RemoveTimer);
         let on_timer_updated = ctx.link().callback(AppMsg::UpdateTimer);
+        let on_timer_stopped = ctx.link().callback(AppMsg::StopTimer);
 
         let props = AppProps {
             timers: Rc::clone(&self.timers),
             timer_add_callback: on_timer_added,
             timer_remove_callback: on_timer_removed,
             timer_update_callback: on_timer_updated,
+            timer_stop_callback: on_timer_stopped,
         };
 
         html! {
             <div class={"content"}>
                 <BrowserRouter>
-                    <HeaderComponent />
+                    <HeaderComponent
+                        timers={Rc::clone(&props.timers)}
+                        on_create_timer={props.timer_add_callback.clone()}
+                        on_delete_timer={props.timer_remove_callback.clone()}
+                        on_toggle_timer={props.timer_update_callback.clone()}
+                        on_stop_timer={props.timer_stop_callback.clone()}
+                    />
                     <SidebarComponent />
                     <div class="container-fluid flex-fluid" style="min-height: 50vh">
                         <Switch<Route> render={move |route| switch(route, props.clone())} />

@@ -1,11 +1,24 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use log::info;
-use yew::{classes, function_component, html, Html};
+use yew::{classes, function_component, html, Html, Properties, Callback};
 use yew_router::history::Location;
 use yew_router::prelude::{use_location, Link};
 use yew_router::Routable;
 
 use crate::Route;
 use crate::components::ActiveTimersDropdown;
+use crate::timer::Timer;
+
+#[derive(Properties, PartialEq)]
+pub struct Props {
+    pub timers: Rc<RefCell<Vec<Timer>>>,
+    pub on_create_timer: Callback<Timer>,
+    pub on_delete_timer: Callback<i32>,
+    pub on_toggle_timer: Callback<i32>,
+    pub on_stop_timer: Callback<i32>,
+}
 
 /// Returns the "active" class string if the provided route matches the location
 fn active(route: Route, location: &Option<Location>) -> String {
@@ -21,7 +34,7 @@ fn active(route: Route, location: &Option<Location>) -> String {
 }
 
 #[function_component]
-pub fn HeaderComponent() -> Html {
+pub fn HeaderComponent(props: &Props) -> Html {
     let location: Option<Location> = if let Some(location) = use_location() {
         info!("{:?}", location.path());
         Some(location)
@@ -54,7 +67,13 @@ pub fn HeaderComponent() -> Html {
                         </li>
                     </ul>
                     <div class="d-flex">
-                        <ActiveTimersDropdown />
+                        <ActiveTimersDropdown
+                            timers={props.timers.clone()}
+                            on_create_timer={props.on_create_timer.clone()}
+                            on_delete_timer={props.on_delete_timer.clone()}
+                            on_toggle_timer={props.on_toggle_timer.clone()}
+                            on_stop_timer={props.on_stop_timer.clone()}
+                        />
                     </div>
                 </div>
             </div>

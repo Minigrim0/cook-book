@@ -15,7 +15,8 @@ pub struct TimerPage {
 pub enum TimerPageMessage {
     AddTimer(Timer),
     RemoveTimer(i32),
-    UpdateTimer(i32, bool),
+    ToggleTimer(i32),
+    StopTimer(i32),
     Tick,
 }
 
@@ -43,9 +44,14 @@ impl Component for TimerPage {
                 ctx.props().timer_remove_callback.emit(id);
                 true
             }
-            TimerPageMessage::UpdateTimer(id, is_running) => {
-                info!("Updating timer: {:?} to {:?}", id, is_running);
-                ctx.props().timer_update_callback.emit((id, is_running));
+            TimerPageMessage::ToggleTimer(id) => {
+                info!("Toggling timer: {:?}", id);
+                ctx.props().timer_update_callback.emit(id);
+                true
+            }
+            TimerPageMessage::StopTimer(id) => {
+                info!("Stopping timer: {:?}", id);
+                ctx.props().timer_stop_callback.emit(id);
                 true
             }
             TimerPageMessage::Tick => {
@@ -110,12 +116,13 @@ impl Component for TimerPage {
                     <div class="timer-list h-75">
                         {ctx.props().timers.borrow().iter().map(|timer| {
                             let timer_id = timer.id;
-                            let new_state = !timer.is_running;
                             let on_delete = ctx.link().callback(move |_| TimerPageMessage::RemoveTimer(timer_id));
-                            let on_toggle = ctx.link().callback(move |_| TimerPageMessage::UpdateTimer(timer_id, new_state));
+                            let on_toggle = ctx.link().callback(move |_| TimerPageMessage::ToggleTimer(timer_id));
+                            let on_stop = ctx.link().callback(move |_| TimerPageMessage::StopTimer(timer_id));
 
                             html! {
-                                <TimerComponent timer={timer.clone()} on_toggle={on_toggle} on_delete={on_delete} />
+                                <TimerComponent timer={timer.clone()} on_toggle={on_toggle} on_delete={on_delete} on_stop={on_stop} />
+
                             }
                         }).collect::<Html>()}
                         if ctx.props().timers.borrow().is_empty() {

@@ -1,10 +1,4 @@
 /// A timer with an id, name, duration, and start time.
-/// 
-/// The `id` is used to identify the timer in the list of timers.
-/// The `name` is the name of the timer.
-/// The `duration` is the duration of the timer in seconds.
-/// The `is_running` is a boolean that indicates if the timer is running.
-/// The `start_time` is the time when the timer started in seconds.
 #[derive(Debug, Clone)]
 pub struct Timer {
     pub id: i32,

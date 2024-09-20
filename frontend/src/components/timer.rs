@@ -8,6 +8,7 @@ pub struct Props {
     pub timer: timer::Timer,
     pub on_toggle: Callback<MouseEvent>,
     pub on_delete: Callback<MouseEvent>,
+    pub on_stop: Callback<MouseEvent>,
 }
 
 #[function_component]
@@ -40,9 +41,18 @@ pub fn Timer(props: &Props) -> Html {
             </div>
             <div class="timer-controls">
                 <button class="toggle-btn" onclick={props.on_toggle.clone()}>
-                    {if props.timer.is_running { "Pause" } else { "Resume" }}
+                    {if props.timer.is_running { 
+                        html! {<i class="bi bi-pause-fill"></i>} 
+                    } else { 
+                        html! {<i class="bi bi-play-fill"></i>} 
+                    }}
                 </button>
-                <button class="delete-btn" onclick={props.on_delete.clone()}>{"Delete"}</button>
+                <button class="stop-btn" onclick={props.on_stop.clone()}>
+                    {html! {<i class="bi bi-stop-fill"></i>}}
+                </button>
+                <button class="delete-btn" onclick={props.on_delete.clone()}>
+                    {html! {<i class="bi bi-trash-fill"></i>}}
+                </button>
             </div>
         </div>
     }

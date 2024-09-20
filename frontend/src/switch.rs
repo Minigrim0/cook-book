@@ -40,6 +40,7 @@ pub fn switch(route: Route, props: AppProps) -> Html {
             timer_add_callback={props.timer_add_callback}
             timer_remove_callback={props.timer_remove_callback}
             timer_update_callback={props.timer_update_callback}
+            timer_stop_callback={props.timer_stop_callback}
         /> },
         Route::Converters => html! { <p>{"Converters"}</p> },
         Route::NotFound => {
