@@ -15,6 +15,7 @@ chrono = { version = "0.4.26", features = ["serde"]}
 serde = { version = "1.0.209", features = ["derive"] }
 log = "0.4.22"
 cfg-if = "1.0.0"
+sha2 = { version = "0.10.8", optional = true }
 
 [features]
-database = ["diesel", "diesel_migrations"]
+database = ["diesel", "diesel_migrations", "sha2"]
