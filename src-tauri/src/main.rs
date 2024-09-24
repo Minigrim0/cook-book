@@ -50,6 +50,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             commands::filter_ingredients,
             commands::reset_database,
             commands::get_job_status,
+            commands::get_recipe_image,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,5 +1,7 @@
 use log::{info, warn};
 use tauri;
+use base64::engine::general_purpose::STANDARD;
+use base64::engine::Engine;
 
 use models::{CompleteRecipe, PaginatedRecipe, RecipeMeta};
 use models::SharedDatabasePool;
@@ -17,6 +19,20 @@ pub fn recipe_meta(state: tauri::State<SharedDatabasePool>) -> Result<RecipeMeta
     })
 }
 
+#[tauri::command]
+pub fn get_recipe_image(state: tauri::State<SharedDatabasePool>, recipe_id: i32) -> Result<String, String> {
+    info!("getting recipe image for recipe {}", recipe_id);
+
+    let image = models::database::loadables::get_recipe_images(recipe_id, &state)?;
+
+    let image = image.first().ok_or("No image found")?;
+    let encoded_image = STANDARD.encode(&image.image_data);
+    Ok(encoded_image)
+}
+
+
+
+/// Filters the recipes on their name, given a pattern. This command also supports pagination
 #[tauri::command]
 /// Filters the recipes on their name, given a pattern. This command also supports pagination
 /// of the results.
@@ -97,6 +113,6 @@ pub fn load_recipe(state: tauri::State<SharedDatabasePool>, recipe_id: i32) -> R
         image: None,
         ingredients,
         steps,
-        images: Vec::new(),
+        images: images,
     })
 }

@@ -32,4 +32,7 @@ extern "C" {
 
     #[wasm_bindgen(js_name = get_job_status, catch)]
     pub async fn get_job_status(job_id: i32) -> Result<JsValue, JsValue>;
+
+    #[wasm_bindgen(js_name = get_recipe_image, catch)]
+    pub async fn get_recipe_image(recipe_id: i32) -> Result<JsValue, JsValue>;
 }

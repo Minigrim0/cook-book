@@ -47,7 +47,7 @@ pub struct CompleteRecipe {
     pub image: Option<String>,
     pub ingredients: Vec<Result<CompleteIngredient, String>>,
     pub steps: Vec<Step>,
-    pub images: Vec<RecipeImage>,
+    pub images: Vec<Image>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

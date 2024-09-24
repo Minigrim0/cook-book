@@ -1,5 +1,6 @@
 use log::{error, info};
 use std::cmp::{max, min};
+use std::collections::HashMap;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlButtonElement, HtmlInputElement};
 use yew::{classes, html, Component, Context, Html};
@@ -12,10 +13,11 @@ use models::PaginatedRecipe;
 use crate::components::PaginatedNavbar;
 use crate::routes::RecipeRoute;
 
-use super::services::filter_recipes;
+use super::services::{filter_recipes, get_recipe_image};
 
 pub struct RecipesPage {
     recipes: Vec<Recipe>,
+    images: HashMap<i32, String>,
     pattern: String,
     total_recipes: i32,
     current_page: i32,
@@ -29,6 +31,8 @@ pub enum Msg {
     PageDown,
     GoToPage(MouseEvent),
     InputChanged(InputEvent),
+    GetRecipeImage(i32),
+    RecipeImageLoaded((i32, Result<String, String>)),
 }
 
 impl Component for RecipesPage {
@@ -40,6 +44,7 @@ impl Component for RecipesPage {
 
         RecipesPage {
             recipes: Vec::new(),
+            images: HashMap::new(),
             pattern: String::new(),
             total_recipes: 0,
             current_page: 0,
@@ -60,6 +65,10 @@ impl Component for RecipesPage {
                         self.recipes = ingredients.0;
                         self.total_recipes = ingredients.1 as i32;
                         self.num_pages = ingredients.2 as i32;
+                        self.recipes.iter().for_each(|r| {
+                            self.images.insert(r.id, "/img/placeholder.png".to_string());
+                            ctx.link().send_message(Msg::GetRecipeImage(r.id));
+                        });
                     }
                     Err(e) => error!("An error occured: {}", e.to_string()),
                 }
@@ -104,6 +113,23 @@ impl Component for RecipesPage {
                     false
                 }
             }
+            Msg::GetRecipeImage(recipe_id) => {
+                let callback = ctx.link().callback(Msg::RecipeImageLoaded);
+                get_recipe_image(recipe_id, callback);
+                true
+            },
+            Msg::RecipeImageLoaded((recipe_id, result)) => {
+                match result {
+                    Ok(image) => {
+                        self.images.insert(
+                            recipe_id,
+                            format!("data:image/jpg;base64,{}", image)
+                        );
+                    }
+                    Err(e) => error!("An error occured: {}", e.to_string()),
+                }
+                true
+            }
         }
     }
 
@@ -147,10 +173,11 @@ impl Component for RecipesPage {
                     if self.total_recipes > 0 {
                         {
                             self.recipes.iter().map(|r| {
+                                let image: String = self.images.get(&r.id).unwrap_or(&"/img/placeholder.png".to_string()).to_string();
                                 html! {
                                     <div class={classes!("col")}>
                                         <div class={classes!("card")}>
-                                            <img src="..." class={classes!("card-img-top")} alt="an delicious image here" />
+                                            <img src={image.clone()} class={classes!("card-img-top")} alt="an delicious image here" />
                                             <div class={classes!("card-body")}>
                                                 <Link<RecipeRoute> classes={classes!("h5", "card-title", "link")} to={RecipeRoute::RecipeDetails { id: r.id }}>
                                                     {&r.name}

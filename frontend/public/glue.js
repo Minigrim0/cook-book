@@ -45,3 +45,9 @@ export async function get_job_status(job_id) {
     jobId: job_id,
   });
 }
+
+export async function get_recipe_image(id) {
+  return await invoke("get_recipe_image", {
+    recipeId: id,
+  });
+}

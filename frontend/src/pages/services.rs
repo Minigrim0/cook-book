@@ -54,3 +54,13 @@ pub fn load_recipe(recipe_id: i32, callback: Callback<Result<CompleteRecipe, Str
         }
     });
 }
+
+/// Spawns a future on the yew runtime to load a recipe image from the backend
+pub fn get_recipe_image(recipe_id: i32, callback: Callback<(i32, Result<String, String>)>) {
+    spawn_local(async move {
+        match glue::get_recipe_image(recipe_id).await {
+            Ok(response) => callback.emit((recipe_id, Ok(serde_wasm_bindgen::from_value(response).unwrap()))),
+            Err(e) => callback.emit((recipe_id, Err(serde_wasm_bindgen::from_value(e).unwrap()))),
+        };
+    });
+}
