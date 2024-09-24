@@ -66,27 +66,55 @@ impl Component for RecipeDetailsPage {
             ("-".to_string(), "-".to_string())
         };
 
+        let image = if let Some(recipe) = &self.recipe {
+            recipe.images.first().map(|i| format!("data:image/jpeg;base64,{}", i)).unwrap_or("/img/placeholder.jpg".to_string())
+        } else {
+            "/img/placeholder.jpg".to_string()
+        };
+
         html! {
             <div>
                 <div class={classes!("row", "p-2")}>
                     if let Some(recipe) = &self.recipe {
                         <h1>{&recipe.name}</h1>
                         <small>{"cook: "}{&recipe_times.0}{" | preparation: "}{&recipe_times.1}</small>
-                        {
-                            recipe.ingredients.iter().map(|i| {
-                                if let Ok(ingredient) = i {
-                                    html! {
-                                        <div>
-                                            <p>{&ingredient.amount}{" "}{&ingredient.unit.name}{" "}{&ingredient.ingredient.name}</p>
-                                        </div>
-                                    }
-                                } else {
-                                    html! {
-                                        <p>{"error"}</p>
-                                    }
-                                }
-                            }).collect::<Html>()
-                        }
+                        <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h2>{"Ingredients"}</h2>
+                                    <ul class="list-group">
+                                        { for recipe.ingredients.iter().map(|i| {
+                                            if let Ok(ingredient) = i {
+                                                html! {
+                                                    <li class="list-group-item">
+                                                        {&ingredient.amount}{" "}{&ingredient.unit.name}{" "}{&ingredient.ingredient.name}
+                                                    </li>
+                                                }
+                                            } else {
+                                                html! {
+                                                    <li class="list-group-item text-danger">{"error"}</li>
+                                                }
+                                            }
+                                        })}
+                                    </ul>
+                                </div>
+                                <div class="ms-3">
+                                    <img src={image.clone()} class="img-fluid float-end ms-3" alt="Recipe Image" />
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h2>{"Steps"}</h2>
+                                <ol class="list-group list-group-numbered">
+                                    { for recipe.steps.iter().map(|step| {
+                                        html! {
+                                            <li class="list-group-item">
+                                                {&step.description}
+                                            </li>
+                                        }
+                                    })}
+                                </ol>
+                            </div>
+                        </div>
                     } else {
                         <div class={classes!("position-absolute", "top-50", "start-50", "translate-middle", "text-muted", "text-center")}>
                             {"Unable to load :/"}

@@ -44,10 +44,9 @@ pub struct CompleteRecipe {
     pub author: Option<Author>,
     pub rating: Option<Rating>,
     pub category: Option<Category>,
-    pub image: Option<String>,
     pub ingredients: Vec<Result<CompleteIngredient, String>>,
     pub steps: Vec<Step>,
-    pub images: Vec<Image>,
+    pub images: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
