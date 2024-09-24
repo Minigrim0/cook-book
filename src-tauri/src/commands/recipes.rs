@@ -77,6 +77,14 @@ pub fn load_recipe(state: tauri::State<SharedDatabasePool>, recipe_id: i32) -> R
         }
     };
 
+    let images = match models::database::loadables::get_recipe_images(base_recipe.id, &state) {
+        Ok(images) => images,
+        Err(e) => {
+            warn!("Unable to load recipe images: {}", e.to_string());
+            Vec::new()
+        }
+    };
+
     Ok(CompleteRecipe {
         id: base_recipe.id,
         name: base_recipe.name,
@@ -89,5 +97,6 @@ pub fn load_recipe(state: tauri::State<SharedDatabasePool>, recipe_id: i32) -> R
         image: None,
         ingredients,
         steps,
+        images: Vec::new(),
     })
 }

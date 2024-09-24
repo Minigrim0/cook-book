@@ -150,7 +150,7 @@ impl Updateable for Rating {
     }
 }
 
-#[cfg_attr(feature = "database", derive(Queryable, Selectable))]
+#[cfg_attr(feature = "database", derive(Queryable, Identifiable, Selectable))]
 #[cfg_attr(feature = "database", diesel(table_name = crate::database::schema::recipe))]
 #[cfg_attr(feature = "database", diesel(check_for_backend(diesel::sqlite::Sqlite)))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -163,8 +163,6 @@ pub struct Recipe {
     pub author_id: i32,
     pub rating_id: i32,
     pub category_id: i32,
-    #[cfg(not(feature = "database"))]
-    pub image: Option<String>,
 }
 
 #[cfg(feature = "database")]
@@ -189,8 +187,11 @@ impl Updateable for Recipe {
     }
 }
 
-#[cfg_attr(feature = "database", derive(Queryable, Selectable))]
+#[cfg_attr(feature = "database", derive(Queryable, Selectable, Associations))]
 #[cfg_attr(feature = "database", diesel(table_name = crate::database::schema::recipe_ingredient))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Recipe)))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Ingredient)))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Unit)))]
 #[cfg_attr(feature = "database", diesel(check_for_backend(diesel::sqlite::Sqlite)))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RecipeIngredient {
@@ -222,7 +223,20 @@ impl Updateable for RecipeIngredient {
     }
 }
 
-#[cfg_attr(feature = "database", derive(Queryable, Selectable))]
+#[cfg_attr(feature = "database", derive(Identifiable, Queryable, Selectable, Associations))]
+#[cfg_attr(feature = "database", diesel(table_name = crate::database::schema::recipe_images))]
+#[cfg_attr(feature = "database", diesel(primary_key(recipe_id, image_id)))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Recipe)))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Image)))]
+#[cfg_attr(feature = "database", diesel(check_for_backend(diesel::sqlite::Sqlite)))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RecipeImage {
+    pub recipe_id: i32,
+    pub image_id: i32,
+}
+
+
+#[cfg_attr(feature = "database", derive(Identifiable, Queryable, Selectable))]
 #[cfg_attr(feature = "database", diesel(table_name = crate::database::schema::image_blobs))]
 #[cfg_attr(feature = "database", diesel(check_for_backend(diesel::sqlite::Sqlite)))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -252,8 +266,9 @@ impl Updateable for Image {
     }
 }
 
-#[cfg_attr(feature = "database", derive(Queryable, Selectable))]
+#[cfg_attr(feature = "database", derive(Queryable, Selectable, Associations))]
 #[cfg_attr(feature = "database", diesel(table_name = crate::database::schema::step))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Recipe)))]
 #[cfg_attr(feature = "database", diesel(check_for_backend(diesel::sqlite::Sqlite)))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Step {
@@ -336,8 +351,9 @@ impl Updateable for Job {
     }
 }
 
-#[cfg_attr(feature = "database", derive(Queryable, Selectable))]
+#[cfg_attr(feature = "database", derive(Queryable, Selectable, Associations))]
 #[cfg_attr(feature = "database", diesel(table_name = crate::database::schema::job_log))]
+#[cfg_attr(feature = "database", diesel(belongs_to(Job)))]
 #[cfg_attr(feature = "database", diesel(check_for_backend(diesel::sqlite::Sqlite)))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobLog {

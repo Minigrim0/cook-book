@@ -8,6 +8,62 @@ use crate::parser::parsers::{
     parse_author, parse_category, parse_ingredients, parse_instructions, parse_rating,
 };
 
+/// Loads images from the folder of the recipes and saves them to the database
+fn load_images(recipe_id: i32, recipe_path: &PathBuf, pool: SharedDatabasePool) -> Result<(), String> {
+    use std::fs;
+    use models::insertables::{NewImage, NewRecipeImage};
+    use sha2::{Sha256, Digest};
+
+    // Get all files in the recipe folder
+    let entries = fs::read_dir(recipe_path).map_err(|e| e.to_string())?;
+
+    for entry in entries {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let path = entry.path();
+
+        // Check if the file is an image (you might want to add more image extensions)
+        if let Some(extension) = path.extension() {
+            if extension == "jpg" || extension == "jpeg" || extension == "png" {
+                // Read the image file
+                let image_data = fs::read(&path).map_err(|e| e.to_string())?;
+
+                // Calculate hash
+                let mut hasher = Sha256::new();
+                hasher.update(&image_data);
+                let hash = format!("{:x}", hasher.finalize());
+
+                // Create new image
+                let new_image = NewImage {
+                    image_data: image_data,
+                    hash: hash,
+                };
+
+                // Save image and get its ID
+                let image_id = match new_image.save(&pool) {
+                    Ok(id) => id,
+                    Err(e) => {
+                        log::error!("Failed to save image: {}", e);
+                        continue;
+                    }
+                };
+
+                // Create recipe-image association
+                let new_recipe_image = NewRecipeImage {
+                    recipe_id: recipe_id,
+                    image_id: image_id,
+                };
+
+                // Save recipe-image association
+                if let Err(e) = new_recipe_image.save(&pool) {
+                    log::error!("Failed to associate image with recipe: {}", e);
+                }
+            }
+        }
+    }
+    
+    Ok(())
+}
+
 pub fn parse_recipe(path: &PathBuf, pool: SharedDatabasePool) -> Result<String, String> {
     // Open the file recipe.json and load it
     let file_path = path.join(r"recipe.json");
@@ -70,6 +126,9 @@ pub fn parse_recipe(path: &PathBuf, pool: SharedDatabasePool) -> Result<String, 
     } else {
         return Err("Unable to parse instructions, no key 'recipeInstructions' found.".to_string());
     }
+
+    // Try to find images
+
 
     Ok(file_path.to_str().unwrap().to_string())
 }

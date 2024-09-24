@@ -9,6 +9,8 @@ mod step;
 mod unit;
 mod job;
 mod job_log;
+mod image;
+mod recipe_image;
 
 pub use author::*;
 pub use category::*;
@@ -21,6 +23,8 @@ pub use step::*;
 pub use unit::*;
 pub use job::*;
 pub use job_log::*;
+pub use image::*;
+pub use recipe_image::*;
 
 use crate::database::SharedDatabasePool;
 

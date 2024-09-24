@@ -192,7 +192,7 @@ impl Component for IngredientsPage {
                                 html! {
                                     <div class={classes!("col")}>
                                         <div class={classes!("card")}>
-                                            <img src="..." class={classes!("card-img-top")} alt="an delicious image here" />
+                                            <img src="..." class={classes!("card-img-top")} alt="A superb ingredient image here" />
                                             <div class={classes!("card-body")}>
                                                 <h5 class={classes!("card-title")}>{&i.name}</h5>
                                                 <p class={classes!("card-text")}>{&i.name}{"'s description"}</p>

@@ -6,6 +6,7 @@ mod rating;
 mod recipe;
 mod step;
 mod unit;
+mod image;
 
 pub use author::*;
 pub use category::*;
@@ -15,3 +16,4 @@ pub use rating::*;
 pub use recipe::*;
 pub use step::*;
 pub use unit::*;
+pub use image::*;
