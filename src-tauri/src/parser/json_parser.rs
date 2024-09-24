@@ -32,6 +32,22 @@ fn load_images(recipe_id: i32, recipe_path: &PathBuf, pool: SharedDatabasePool) 
                 hasher.update(&image_data);
                 let hash = format!("{:x}", hasher.finalize());
 
+                if let Some(existing_image) = models::database::loadables::find_image_by_hash(&hash, &pool) {
+                    log::info!("Image with hash {} already exists: {}", hash, existing_image);
+
+                    // Attach the image to the recipe
+                    let new_recipe_image = NewRecipeImage {
+                        recipe_id: recipe_id,
+                        image_id: existing_image,
+                    };
+
+                    if let Err(e) = new_recipe_image.save(&pool) {
+                        log::error!("Failed to associate image with recipe: {}", e);
+                    }
+                    continue;
+                }
+                log::info!("Image with hash {} does not exist", hash);
+
                 // Create new image
                 let new_image = NewImage {
                     image_data: image_data,

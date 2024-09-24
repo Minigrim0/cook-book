@@ -26,7 +26,7 @@ impl Component for LoaderPage {
 
     fn create(ctx: &Context<Self>) -> Self {
         let link = ctx.link().clone();
-        let interval = Interval::new(5000, move || link.send_message(Msg::UpdateJobs));
+        let interval = Interval::new(500, move || link.send_message(Msg::UpdateJobs));
         Self { 
             job_ids: Vec::new(),
             jobs: Vec::new(),
@@ -122,18 +122,28 @@ impl Component for LoaderPage {
                 </div>
                 <div class={classes!("row", "col-12", "p-2")}>
                     <h4>{"Current Jobs:"}</h4>
-                    {for self.jobs.iter().map(|job| html! {
-                        <div class={classes!("row", "col-12", "p-2")}>
-                            <p class={classes!("col-3")}>{"Job ID: "}{job.job.id}</p>
-                            <p class={classes!("col-3")}>{"Status: "}{&job.job.status}</p>
-                            <div class={classes!("col-6", "progress")}>
-                                <div class={classes!("progress-bar")} role="progressbar" 
-                                    style={format!("width: {}%", job.job.progress * 100.0)} 
-                                    aria-valuenow={job.job.progress.to_string()} aria-valuemin="0" aria-valuemax="100">
-                                    {format!("{:.0}%", job.job.progress * 100.0)}
+                    {for self.jobs.iter().map(|job| {
+                        let last_log = job.logs.last();
+
+                        html! {
+                            <div class={classes!("row", "col-12", "p-2")}>
+                                <p class={classes!("col-3")}>{"Job ID: "}{job.job.id}</p>
+                                <p class={classes!("col-3")}>{"Status: "}{&job.job.status}</p>
+                                <div class={classes!("col-6", "progress")}>
+                                    <div class={classes!("progress-bar")} role="progressbar" 
+                                        style={format!("width: {}%", job.job.progress * 100.0)} 
+                                        aria-valuenow={job.job.progress.to_string()} aria-valuemin="0" aria-valuemax="100">
+                                        {format!("{:.0}%", job.job.progress * 100.0)}
+                                    </div>
                                 </div>
+                                if let Some(log) = last_log {
+                                    <div class={classes!("row", "col-12", "p-2")}>
+                                        <p class={classes!("col-2")}>{&log.created_at.to_string()}</p>
+                                        <p class={classes!("col-10")}>{&log.log_entry}</p>
+                                    </div>
+                                }
                             </div>
-                        </div>
+                        }
                     })}
                 </div>
             </div>
