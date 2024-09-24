@@ -39,6 +39,11 @@ pub fn reset_database(window: tauri::Window) -> Result<(), String> {
                     error!("Failed to delete recipe: {}", e);
                     return;
             }
+            if let Err(e) = diesel::sql_query("DELETE FROM image_blobs;")
+                .execute(conn) {
+                    error!("Failed to delete image_blobs: {}", e);
+                    return;
+            }
             info!("Database reset");
         } else {
             info!("Database reset cancelled");
