@@ -128,7 +128,9 @@ pub fn parse_recipe(path: &PathBuf, pool: SharedDatabasePool) -> Result<String, 
     }
 
     // Try to find images
-
+    if let Err(e) = load_images(recipe_id, path, pool) {
+        log::error!("Unable to load images for recipe {}: {}", recipe.name, e);
+    }
 
     Ok(file_path.to_str().unwrap().to_string())
 }
