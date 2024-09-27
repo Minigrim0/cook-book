@@ -112,6 +112,12 @@ impl Component for SidebarComponent {
                                                 {"by ingredient"}
                                             </p>
                                         </Link<RecipeRoute>>
+                                        <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::Admin}>
+                                            <p>
+                                                <i class="bi bi-gear me-2"></i>
+                                                {"admin"}
+                                            </p>
+                                        </Link<RecipeRoute>>
                                     </div>
                                 </div>
                             </div>
