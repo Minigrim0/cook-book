@@ -5,7 +5,7 @@ use yew::prelude::*;
 
 const ITEMS_PER_PAGE: usize = 10;
 
-pub struct IngredientList {
+pub struct AdminIngredientList {
     ingredients: Vec<Ingredient>,
     current_page: usize,
     total_ingredients: usize,
@@ -17,7 +17,7 @@ pub enum Msg {
     UpdateIngredient(usize, String),
 }
 
-impl Component for IngredientList {
+impl Component for AdminIngredientList {
     type Message = Msg;
     type Properties = ();
 
