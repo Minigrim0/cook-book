@@ -5,8 +5,8 @@ use yew::Callback;
 use yew::{classes, html, Component, Context, Html};
 use yew_router::prelude::Link;
 
+use crate::routes::{AdminRoute, RecipeRoute, ToolsRoute};
 use crate::{get_recipe_meta, reset_database};
-use crate::routes::{RecipeRoute, ToolsRoute};
 use models::RecipeMeta;
 
 pub struct SidebarComponent {
@@ -112,12 +112,12 @@ impl Component for SidebarComponent {
                                                 {"by ingredient"}
                                             </p>
                                         </Link<RecipeRoute>>
-                                        <Link<RecipeRoute> classes={classes!("list-group-item")} to={RecipeRoute::Admin}>
+                                        <Link<AdminRoute> classes={classes!("list-group-item")} to={AdminRoute::AdminRoot}>
                                             <p>
                                                 <i class="bi bi-gear me-2"></i>
                                                 {"admin"}
                                             </p>
-                                        </Link<RecipeRoute>>
+                                        </Link<AdminRoute>>
                                     </div>
                                 </div>
                             </div>

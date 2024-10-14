@@ -1,9 +1,11 @@
 use yew::{html, Html};
 use yew_router::prelude::Switch;
 
-
-use super::pages::{DefaultPage, IngredientsPage, LoaderPage, RecipeDetailsPage, RecipesPage, TimerPage, AdminPages};
-use super::routes::{RecipeRoute, Route, ToolsRoute, AdminRoute};
+use super::pages::{
+    admin_pages, DefaultPage, IngredientsPage, LoaderPage, RecipeDetailsPage, RecipesPage,
+    TimerPage,
+};
+use super::routes::{AdminRoute, RecipeRoute, Route, ToolsRoute};
 use super::AppProps;
 
 /// Switch for tools routes
@@ -28,10 +30,10 @@ fn switch_recipe(route: RecipeRoute) -> Html {
 /// Switch for admin routes
 fn switch_admin(route: AdminRoute) -> Html {
     match route {
-        AdminRoute::AdminRoot => html! { <AdminPages::AdminRoot /> },
-        AdminRoute::Ingredients => html! { <AdminPages::IngredientList /> },
-        AdminRoute::Recipes => html! { <AdminPages::RecipeList /> },
-        AdminRoute::Units => html! { <AdminPages::UnitList /> },
+        AdminRoute::AdminRoot => html! { <admin_pages::AdminRoot /> },
+        AdminRoute::Ingredients => html! { <admin_pages::IngredientList /> },
+        AdminRoute::Recipes => html! { <admin_pages::RecipeList /> },
+        AdminRoute::Units => html! { <admin_pages::UnitList /> },
     }
 }
 
@@ -55,7 +57,7 @@ pub fn switch(route: Route, props: AppProps) -> Html {
         Route::Converters => html! { <p>{"Converters"}</p> },
         Route::NotFound => {
             html! { <div class="position-absolute top-50 start-50 translate-middle"><h1>{"Not found"}</h1></div> }
-        },
+        }
         Route::AdminRoot | Route::Admin => {
             html! { <Switch<AdminRoute> render={switch_admin} /> }
         }

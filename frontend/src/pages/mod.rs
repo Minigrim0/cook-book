@@ -1,18 +1,18 @@
-mod default;
-mod loader;
-mod timer;
-mod ingredients_list;
-mod recipes_list;
-mod recipe_details;
-mod services;
 mod admin;
+mod default;
+mod ingredients_list;
+mod loader;
+mod recipe_details;
+mod recipes_list;
+mod services;
+mod timer;
 
 pub use default::DefaultPage;
-pub use loader::LoaderPage;
-pub use timer::TimerPage;
-pub use recipes_list::RecipesPage;
 pub use ingredients_list::IngredientsPage;
+pub use loader::LoaderPage;
 pub use recipe_details::RecipeDetailsPage;
-pub mod AdminPages {
-    pub use admin::*;
-};
+pub use recipes_list::RecipesPage;
+pub use timer::TimerPage;
+pub mod admin_pages {
+    pub use super::admin::AdminRoot;
+}

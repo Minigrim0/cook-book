@@ -1,7 +1,7 @@
+use models::models::Ingredient;
+use models::PaginatedIngredients;
+
 use yew::prelude::*;
-use crate::models::Ingredient;
-use crate::components::Pagination;
-use super::service;
 
 const ITEMS_PER_PAGE: usize = 10;
 
@@ -35,12 +35,24 @@ impl Component for IngredientList {
             Msg::LoadIngredients(page) => {
                 let link = ctx.link().clone();
                 wasm_bindgen_futures::spawn_local(async move {
-                    match service::get_paginated_ingredient(page, ITEMS_PER_PAGE).await {
+                    match crate::glue::filter_ingredients(
+                        String::new(),
+                        page as i32,
+                        ITEMS_PER_PAGE as i32,
+                    )
+                    .await
+                    {
                         Ok(paginated_ingredients) => {
-                            link.send_message(Msg::IngredientsLoaded(
-                                paginated_ingredients.items,
-                                paginated_ingredients.total,
-                            ));
+                            let data: Result<PaginatedIngredients, String> =
+                                serde_wasm_bindgen::from_value(paginated_ingredients)
+                                    .map_err(|e| e.to_string());
+
+                            match data {
+                                Ok(result) => {
+                                    link.send_message(Msg::IngredientsLoaded(result.0, result.1))
+                                }
+                                Err(e) => log::error!("Unable to convert JsValue, {}", e),
+                            }
                         }
                         Err(e) => {
                             log::error!("Failed to load ingredients: {:?}", e);
@@ -99,12 +111,12 @@ impl Component for IngredientList {
                         })}
                     </tbody>
                 </table>
-                <Pagination
-                    current_page={self.current_page}
-                    total_items={self.total_ingredients}
-                    items_per_page={ITEMS_PER_PAGE}
-                    on_page_change={ctx.link().callback(Msg::LoadIngredients)}
-                />
+                // <Pagination
+                //     current_page={self.current_page}
+                //     total_items={self.total_ingredients}
+                //     items_per_page={ITEMS_PER_PAGE}
+                //     on_page_change={ctx.link().callback(Msg::LoadIngredients)}
+                // />
             </div>
         }
     }

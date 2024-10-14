@@ -3,13 +3,11 @@ mod services;
 
 pub use ingredient_list::IngredientList;
 
-mod admin_root;
 mod recipe_list;
 mod unit_list;
 
-pub use admin_root::AdminRoot;
-pub use recipe_list::RecipeList;
-pub use unit_list::UnitList;
+pub use recipe_list::AdminRecipeList;
+pub use unit_list::AdminUnitList;
 
 use yew::prelude::*;
 
@@ -20,6 +18,7 @@ pub enum AdminPage {
     Units,
 }
 
+/// Root component for the admin section
 pub struct AdminRoot {
     current_page: AdminPage,
 }
@@ -80,8 +79,8 @@ impl AdminRoot {
     fn render_current_page(&self) -> Html {
         match self.current_page {
             AdminPage::Ingredients => html! { <IngredientList /> },
-            AdminPage::Recipes => html! { <RecipeList /> },
-            AdminPage::Units => html! { <UnitList /> },
+            AdminPage::Recipes => html! { <AdminRecipeList /> },
+            AdminPage::Units => html! { <AdminUnitList /> },
         }
     }
 }
