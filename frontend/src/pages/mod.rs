@@ -14,6 +14,7 @@ pub use recipe_details::RecipeDetailsPage;
 pub use recipes_list::RecipesPage;
 pub use timer::TimerPage;
 pub mod admin_pages {
+    pub use super::admin::AdminIngredientDetail;
     pub use super::admin::AdminIngredientList;
     pub use super::admin::AdminRecipeList;
     pub use super::admin::AdminRoot;

@@ -32,8 +32,13 @@ fn switch_admin(route: AdminRoute) -> Html {
     match route {
         AdminRoute::AdminRoot => html! { <admin_pages::AdminRoot /> },
         AdminRoute::Ingredients => html! { <admin_pages::AdminIngredientList /> },
+        AdminRoute::IngredientsDetail { id } => {
+            html! { <admin_pages::AdminIngredientDetail id={id} /> }
+        }
         AdminRoute::Recipes => html! { <admin_pages::AdminRecipeList /> },
+        AdminRoute::RecipesDetail { id } => html! { <admin_pages::AdminRecipeList /> },
         AdminRoute::Units => html! { <admin_pages::AdminUnitList /> },
+        AdminRoute::UnitsDetail { id } => html! { <admin_pages::AdminUnitList /> },
     }
 }
 

@@ -1,10 +1,15 @@
+mod ingredient_detail;
 mod ingredient_list;
 mod recipe_list;
 mod services;
 mod unit_list;
 
 use yew::prelude::*;
+use yew_router::prelude::Link;
 
+use crate::routes::AdminRoute;
+
+pub use ingredient_detail::AdminIngredientDetail;
 pub use ingredient_list::AdminIngredientList;
 pub use recipe_list::AdminRecipeList;
 pub use unit_list::AdminUnitList;
@@ -27,19 +32,19 @@ impl Component for AdminRoot {
                 <nav>
                     <ul>
                         <li>
-                            <a>
+                            <Link<AdminRoute> to={AdminRoute::Ingredients}>
                                 {"Ingredients"}
-                            </a>
+                            </Link<AdminRoute>>
                         </li>
                         <li>
-                            <a>
+                            <Link<AdminRoute> to={AdminRoute::Recipes}>
                                 {"Recipes"}
-                            </a>
+                            </Link<AdminRoute>>
                         </li>
                         <li>
-                            <a>
+                            <Link<AdminRoute> to={AdminRoute::Units}>
                                 {"Units"}
-                            </a>
+                            </Link<AdminRoute>>
                         </li>
                     </ul>
                 </nav>

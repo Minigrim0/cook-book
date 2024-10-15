@@ -47,15 +47,20 @@ pub enum RecipeRoute {
     RecipeDetails { id: i32 },
 }
 
-
 #[derive(Clone, Routable, PartialEq)]
 pub enum AdminRoute {
     #[at("/admin")]
     AdminRoot,
     #[at("/admin/ingredients")]
     Ingredients,
+    #[at("/admin/ingredients/:id")]
+    IngredientsDetail { id: i32 },
     #[at("/admin/recipes")]
     Recipes,
+    #[at("/admin/recipes/:id")]
+    RecipesDetail { id: i32 },
     #[at("/admin/units")]
     Units,
+    #[at("/admin/units/:id")]
+    UnitsDetail { id: i32 },
 }

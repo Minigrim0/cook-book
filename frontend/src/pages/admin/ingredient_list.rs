@@ -1,9 +1,17 @@
+use log::{error, info};
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlButtonElement};
+use yew::prelude::*;
+use yew::MouseEvent;
+use yew_router::prelude::*;
+
+use crate::components::PaginatedNavbar;
+use crate::routes::AdminRoute;
+
 use models::models::Ingredient;
 use models::PaginatedIngredients;
 
-use yew::prelude::*;
-
-const ITEMS_PER_PAGE: usize = 10;
+const ITEMS_PER_PAGE: usize = 20;
 
 pub struct AdminIngredientList {
     ingredients: Vec<Ingredient>,
@@ -15,6 +23,9 @@ pub enum Msg {
     LoadIngredients(usize),
     IngredientsLoaded(Vec<Ingredient>, usize),
     UpdateIngredient(usize, String),
+    PageDown,
+    PageUp,
+    GoToPage(MouseEvent),
 }
 
 impl Component for AdminIngredientList {
@@ -37,8 +48,8 @@ impl Component for AdminIngredientList {
                 wasm_bindgen_futures::spawn_local(async move {
                     match crate::glue::filter_ingredients(
                         String::new(),
-                        page as i32,
                         ITEMS_PER_PAGE as i32,
+                        ((page - 1) * ITEMS_PER_PAGE) as i32,
                     )
                     .await
                     {
@@ -74,49 +85,94 @@ impl Component for AdminIngredientList {
                 }
                 true
             }
+            Msg::PageUp | Msg::PageDown | Msg::GoToPage(_) => {
+                self.current_page = match msg {
+                    Msg::PageUp => self.current_page + 1,
+                    Msg::PageDown => self.current_page - 1,
+                    Msg::GoToPage(e) => {
+                        // Get the page number from the button's value field
+                        let button_opt = e.target().map(|t| {
+                            t.dyn_into::<HtmlButtonElement>().map(|b| {
+                                b.value()
+                                    .parse::<usize>()
+                                    .map_err(|e| {
+                                        error!(
+                                            "Unable to parse value from button: {}",
+                                            e.to_string()
+                                        )
+                                    })
+                                    .unwrap_or(0)
+                            })
+                        });
+
+                        if let Some(button) = button_opt {
+                            match button {
+                                Ok(value) => {
+                                    info!("Go to page: {}", value);
+                                    value
+                                }
+                                Err(e) => {
+                                    error!("Unable to get button value; {}", e.to_string());
+                                    0
+                                }
+                            }
+                        } else {
+                            error!("Unable to get an event target");
+                            0
+                        }
+                    }
+                    _ => {
+                        error!("Invalid state");
+                        0
+                    }
+                };
+
+                ctx.link()
+                    .send_message(Msg::LoadIngredients(self.current_page));
+                false
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let previous_cb = ctx.link().callback(|_| Msg::PageDown);
+        let next_cb = ctx.link().callback(|_| Msg::PageUp);
+        let button_cb = ctx.link().callback(Msg::GoToPage);
+
         html! {
             <div class="ingredient-list">
                 <h2>{"Ingredients"}</h2>
                 <table>
                     <thead>
                         <tr>
+                            <th>{"ID"}</th>
                             <th>{"Name"}</th>
-                            <th>{"Actions"}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {for self.ingredients.iter().enumerate().map(|(index, ingredient)| {
-                            let index = index;
+                        {self.ingredients.iter().map(|ingredient| {
                             html! {
                                 <tr key={ingredient.id}>
                                     <td>
-                                        <input
-                                            type="text"
-                                            value={ingredient.name.clone()}
-                                            onchange={ctx.link().callback(move |e: Event| {
-                                                let input: web_sys::HtmlInputElement = e.target_unchecked_into();
-                                                Msg::UpdateIngredient(index, input.value())
-                                            })}
-                                        />
+                                        <Link<AdminRoute> to={AdminRoute::IngredientsDetail { id: ingredient.id }}>
+                                            {ingredient.id}
+                                        </Link<AdminRoute>>
                                     </td>
                                     <td>
-                                        // Add edit and delete buttons here if needed
+                                        {ingredient.name.clone()}
                                     </td>
                                 </tr>
                             }
-                        })}
+                        }).collect::<Html>()}
                     </tbody>
                 </table>
-                // <Pagination
-                //     current_page={self.current_page}
-                //     total_items={self.total_ingredients}
-                //     items_per_page={ITEMS_PER_PAGE}
-                //     on_page_change={ctx.link().callback(Msg::LoadIngredients)}
-                // />
+                <PaginatedNavbar
+                    previous_callback={previous_cb.clone()}
+                    next_callback={next_cb.clone()}
+                    number_callback={button_cb.clone()}
+                    current_page={self.current_page}
+                    num_pages={self.num_pages}
+                />
             </div>
         }
     }
